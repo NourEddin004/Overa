@@ -1,0 +1,11 @@
+.DS_Store
+.claude/
+.impeccable/
+
+# working files kept locally, not part of the site
+bubble-prev.webp
+car-before.webp
+car-after.webp
+hero-car.png
+hero-car.webp
+logo-mark.webp
