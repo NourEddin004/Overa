@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Overa Automotive Care</title>
+<script>
+/* set the language before first paint, so an Arabic visitor never sees the LTR layout flash */
+try{
+  var _l=new URLSearchParams(location.search).get('lang')||localStorage.getItem('overa-lang');
+  if(_l==='ar'){ document.documentElement.lang='ar'; }
+}catch(e){}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,7 +131,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 #nav:not(.scrolled) .nav-links a::after   { background: var(--gold-l); }
 #nav:not(.scrolled) .lang-btn.active      { color: var(--gold-l); }
 #nav:not(.scrolled) .lang-btn             { color: rgba(251,248,244,.80); }
-#nav:not(.scrolled) .lang-btn + .lang-btn { border-left-color: rgba(251,248,244,.24); }
+#nav:not(.scrolled) .lang-btn + .lang-btn { border-inline-start-color: rgba(251,248,244,.24); }
 #nav:not(.scrolled) .lang-btn:hover       { color: #FBF8F4; }
 #nav:not(.scrolled) .nav-hamburger        { border-color: rgba(251,248,244,.44); }
 #nav:not(.scrolled) .nav-hamburger span   { background: #FBF8F4; }
@@ -161,7 +168,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   line-height: 1.15;
   transition: background .22s, color .22s;
 }
-.lang-btn + .lang-btn { border-left: 1px solid rgba(26,18,16,.14); }
+.lang-btn + .lang-btn { border-inline-start: 1px solid rgba(26,18,16,.14); }
 .lang-btn:hover { color: var(--burg); }
 .lang-btn.active { background: none; color: var(--burg); box-shadow: inset 0 -1px 0 currentColor; }
 .lang-btn[lang="ar"] { font-family: var(--ar); font-size: 13px; letter-spacing: 0; }
@@ -257,7 +264,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 }
 #mobileMenu.open { display:flex; }
 .mm-close {
-  position: absolute; top: 24px; right: 24px;
+  position: absolute; top: 24px; inset-inline-end: 24px;
   background: none; border: 1px solid var(--bord);
   color: var(--fg); width:40px; height:40px;
   display:flex; align-items:center; justify-content:center;
@@ -450,13 +457,13 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
    CONCEPT
 ══════════════════════════════ */
 #concept { padding-block: var(--sec); }
-.concept-grid { display: grid; grid-template-columns: .82fr 1fr; gap: clamp(48px,6vw,86px); align-items: center; }
+.concept-grid { display: grid; grid-template-columns: 1.12fr 1fr; gap: clamp(48px,6vw,86px); align-items: center; }
 .concept-visual { display: flex; align-items:center; justify-content:center; }
 .concept-content h2 { font-size: clamp(36px,4vw,52px); line-height: 1.1; margin-block: 0 24px; }
 .concept-content p { font-size: 15px; color:var(--fg2); line-height:1.85; max-width:420px; }
 .concept-pills { display: flex; flex-wrap:wrap; gap:10px; margin-top:32px; }
 .pill { padding: 7px 16px; border: 1px solid var(--bordb); font-size: 10px; letter-spacing:.1em; text-transform:uppercase; color:var(--burg); }
-@media(max-width:820px) { .concept-grid{grid-template-columns:1fr;gap:48px;} .ba-frame{max-width:400px;} }
+@media(max-width:820px) { .concept-grid{grid-template-columns:1fr;gap:48px;} .ba-frame{max-width:560px;} }
 
 /* ══════════════════════════════
    SERVICES
@@ -572,9 +579,24 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .footer-motto { font-family:var(--serif); font-size:13px; font-style:italic; color:rgba(255,255,255,.5); }
 @media(max-width:820px){ .footer-top{grid-template-columns:1fr;gap:40px;} }
 
-/* Arabic — the layout never mirrors, only the words change. plaintext gives each
-   Arabic run its own RTL paragraph direction, so trailing punctuation lands on the
-   correct side, without reordering a single flex or grid row. */
+/* ══════════════════════════════
+   ARABIC — same left-to-right layout, Arabic words
+══════════════════════════════ */
+/* Arabic keeps the English layout; only the words and their typography change.
+   Arabic has no capitals and its letter joins break under tracking, so uppercase and
+   letter-spacing are switched off. Tajawal has no italic, so slanted styles are dropped. */
+:lang(ar), :lang(ar) * { letter-spacing: normal !important; text-transform: none !important; }
+:lang(ar) *, :lang(ar) *::before, :lang(ar) *::after { font-style: normal !important; }
+:lang(ar) :is(h1, h2, h3, h4) { line-height: 1.4 !important; }
+:lang(ar) p { line-height: 1.9; }
+:lang(ar) .pr-mark { text-indent: 0; }
+/* an Arabic price reads number first, so the gap goes before the currency */
+:lang(ar) .pkg-amt i { margin-inline: 7px 0; }
+/* the small uppercase labels were sized for Latin capitals; Arabic needs a little more */
+:lang(ar) :is(.bk-sum-l, .bk-fld label, .bk-rc-top span, .bk-rc-sub, .bk-bar-lbl, .bk-day-w,
+              .bk-tag, .bk-per-l, .pr-meta span, .pr-colhead, .pr-sub, .pr-ref, .label) { font-size: 11px !important; }
+/* plaintext gives each Arabic paragraph its own direction, so trailing punctuation
+   lands on the correct side, while the layout itself stays left-to-right */
 :lang(ar) h1, :lang(ar) h2, :lang(ar) h3, :lang(ar) h4,
 :lang(ar) p,  :lang(ar) li, :lang(ar) label, :lang(ar) span,
 :lang(ar) .why-ttl,
@@ -645,10 +667,24 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .book-open { padding:20px 58px; font-size:13px; letter-spacing:.16em; }
 @media(max-width:540px){ .book-open { width:100%; justify-content:center; padding-inline:24px; } }
 
+/* the three things the client gets, set as a quiet row above the button */
+.book-perks { list-style:none; display:grid; grid-template-columns:repeat(3,1fr); margin:0 0 46px; border-top:1px solid var(--bord); border-bottom:1px solid var(--bord); }
+.book-perks li { display:flex; flex-direction:column; align-items:center; gap:9px; padding:28px 22px 26px; text-align:center; }
+.book-perks li + li { border-inline-start:1px solid var(--bord); }
+.bp-n { font-family:var(--serif); font-size:11.5px; letter-spacing:.22em; color:var(--gold-d); font-variant-numeric:lining-nums tabular-nums; }
+/* every title holds two lines, so the three descriptions start on one line across the row */
+.book-perks b { display:flex; align-items:center; justify-content:center; min-height:2.5em; font-family:var(--serif); font-size:20px; font-weight:500; line-height:1.25; text-align:center; text-wrap:balance; color:var(--fg); }
+.book-perks li > span:last-child { font-size:14px; line-height:1.6; color:var(--fg2); max-width:230px; }
+@media(max-width:680px){
+  .book-perks { grid-template-columns:1fr; }
+  .book-perks li { padding:22px 8px 20px; }
+  .book-perks li + li { border-inline-start:none; border-top:1px solid var(--bord); }
+}
+
 /* ══════════════════════════════
-   BOOKING MODAL
+   BOOKING MODAL — rounded, layered surfaces; the same five steps
 ══════════════════════════════ */
-.bk-overlay { position:fixed; inset:0; z-index:200; background:rgba(26,18,16,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center;
+.bk-overlay { position:fixed; inset:0; z-index:200; background:rgba(24,14,14,.62); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center;
   padding:max(18px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(18px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));
   opacity:0; transition:opacity .3s; }
 .bk-overlay.on { opacity:1; }
@@ -656,6 +692,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
    still covers the page and swallows every click */
 .bk-overlay[hidden] { display:none; }
 .bk-bar[hidden] { display:none; }
+
 /* the contact dialog: one small card, not the five-step rail */
 .ct-overlay { align-items:center; }
 .ct-card {
@@ -671,13 +708,13 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .ct-close { position:absolute; top:14px; inset-inline-end:14px; z-index:2; }
 .ct-h { font-family:var(--serif); font-size:31px; font-weight:500; line-height:1.15; margin:0 0 8px; }
 .ct-p { font-size:13px; color:var(--fg2); line-height:1.6; margin:0 0 22px; }
-.ct-card .bk-card { margin-bottom:16px; background:transparent; border:none; }
+.ct-card .bk-card { display:block; margin-bottom:16px; background:transparent; border:none; }
 .ct-card .bk-fld {
-  background:#FCFAF6; border:1px solid var(--bord); border-bottom:1px solid var(--bord);
+  background:#FCFAF6; border:1px solid var(--bord); border-radius:0;
   padding:11px 14px 12px; margin-bottom:10px; transition:border-color .2s, background .2s;
 }
 .ct-card .bk-fld:last-child { margin-bottom:0; }
-.ct-card .bk-fld:focus-within { border-color:var(--burg); background:var(--bg-s); }
+.ct-card .bk-fld:focus-within { border-color:var(--burg); background:var(--bg-s); box-shadow:none; }
 .ct-card .bk-fld label { font-size:9px; letter-spacing:.16em; color:var(--fg2); margin-bottom:4px; }
 .ct-card .bk-fld:focus-within label { color:var(--burg); }
 .ct-card input, .ct-card select { font-size:15px; }
@@ -700,119 +737,131 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .ct-done p { font-size:13px; color:var(--fg2); line-height:1.7; }
 .ct-done[hidden] { display:none; }
 @media(max-width:480px){ .ct-card { padding:34px 22px 28px; } }
-.bk-modal { width:min(1060px,100%); max-height:100%; background:var(--bg-s); display:grid; grid-template-columns:300px 1fr; grid-template-rows:minmax(0,1fr); overflow:hidden; box-shadow:0 30px 90px rgba(0,0,0,.4); transform:translateY(16px) scale(.985); transition:transform .4s var(--ease); }
+
+/* the shell: a dark rail on the start side, the working pane beside it */
+.bk-modal { width:min(1080px,100%); max-height:100%; background:var(--bg); display:grid; grid-template-columns:300px 1fr; grid-template-rows:minmax(0,1fr); overflow:hidden; border-radius:24px;
+  box-shadow:0 40px 100px -20px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06);
+  transform:translateY(18px) scale(.98); transition:transform .5s var(--ease); }
 .bk-overlay.on .bk-modal { transform:none; }
 
-.bk-rail { background:linear-gradient(170deg,#7A1828 0%,#55101C 55%,#3C0B14 100%); color:#F3EAE2; padding:34px 30px; display:flex; flex-direction:column; min-width:0; min-height:0; overflow-y:auto; }
-.bk-rail-logo { display:flex; align-items:center; gap:11px; margin-bottom:32px; }
+/* left rail: brand, the five steps, the chosen package and the trust line */
+.bk-rail { position:relative; color:#F3EAE2; padding:36px 30px 30px; display:flex; flex-direction:column; min-width:0; min-height:0; overflow-y:auto;
+  background:radial-gradient(120% 60% at 0% 0%, rgba(220,192,138,.2), rgba(220,192,138,0) 60%),
+             linear-gradient(176deg,#7E1A2A 0%,#58111E 55%,#3A0A13 100%); }
+.bk-rail-logo { display:flex; align-items:center; gap:11px; margin-bottom:34px; }
 .bk-rail-logo img { width:38px; height:auto; }
 .bk-rail-brand { display:flex; flex-direction:column; min-width:0; }
 .bk-rail-brand span:first-child { font-family:var(--serif); font-size:17px; letter-spacing:.1em; }
 .bk-rail-brand span:last-child { font-size:8.5px; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.5); }
-.bk-rail-h { font-family:var(--serif); font-size:25px; font-weight:500; line-height:1.25; margin-bottom:12px; text-wrap:balance; }
-.bk-rail-p { font-size:13px; line-height:1.7; color:rgba(255,255,255,.55); margin-bottom:28px; }
-.bk-rail-pick { margin:-10px 0 26px; padding:13px 15px; border:1px solid rgba(184,149,74,.42); background:rgba(0,0,0,.16); }
+.bk-rail-h { font-family:var(--serif); font-size:26px; font-weight:500; line-height:1.22; margin-bottom:12px; text-wrap:balance; }
+.bk-rail-p { font-size:13px; line-height:1.7; color:rgba(255,255,255,.58); margin-bottom:28px; }
+.bk-rail-pick { margin:-6px 0 26px; padding:14px 16px; border-radius:14px; border:1px solid rgba(220,192,138,.36); background:rgba(0,0,0,.18); }
 .bk-rail-pick[hidden] { display:none; }
 .bk-pick-l { display:block; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-l); margin-bottom:5px; }
 .bk-pick-v { display:block; font-size:15px; font-family:var(--serif); color:#fff; }
 .bk-pick-s { display:block; margin-top:3px; font-size:11.5px; color:rgba(255,255,255,.66); font-variant-numeric:lining-nums tabular-nums; }
-.bk-steps { list-style:none; display:flex; flex-direction:column; gap:3px; }
-.bk-steps li { display:flex; align-items:center; gap:13px; padding:10px 13px; font-size:13px; color:rgba(255,255,255,.45); transition:background .3s,color .3s; }
+.bk-steps { list-style:none; display:flex; flex-direction:column; gap:6px; }
+.bk-steps li { display:flex; align-items:center; gap:13px; padding:11px 14px; border-radius:14px; font-size:13.5px; color:rgba(255,255,255,.45); transition:background .3s,color .3s,box-shadow .3s; }
 .bk-steps li[hidden] { display:none; }
-.bk-steps li.on { background:rgba(255,255,255,.1); color:#fff; }
-.bk-steps li.done { color:rgba(255,255,255,.75); }
-.bk-num { width:23px; height:23px; border:1px solid rgba(255,255,255,.25); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; font-variant-numeric:lining-nums; transition:background .3s,border-color .3s,color .3s; }
-.bk-steps li.on .bk-num { background:var(--gold); border-color:var(--gold); color:#3C0B14; }
-.bk-steps li.done .bk-num { background:rgba(184,149,74,.25); border-color:var(--gold); color:var(--gold); }
-.bk-trust { margin-top:auto; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); padding:16px 18px; }
+.bk-steps li.on { background:rgba(255,255,255,.09); color:#fff; box-shadow:inset 0 0 0 1px rgba(220,192,138,.34); }
+.bk-steps li.done { color:rgba(255,255,255,.8); }
+.bk-num { width:26px; height:26px; border:1px solid rgba(255,255,255,.28); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; font-variant-numeric:lining-nums; transition:background .3s,border-color .3s,color .3s,box-shadow .3s; }
+.bk-steps li.on .bk-num { background:linear-gradient(135deg,var(--gold-l),var(--gold)); border-color:transparent; color:#3C0B14; box-shadow:0 0 0 4px rgba(220,192,138,.16); }
+.bk-steps li.done .bk-num { background:rgba(184,149,74,.22); border-color:var(--gold); color:var(--gold-l); }
+.bk-trust { margin-top:auto; border-radius:14px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); padding:16px 18px; }
 .bk-stars { color:var(--gold); font-size:11.5px; letter-spacing:.3em; margin-bottom:8px; }
 .bk-trust-t { font-size:11.5px; margin-bottom:4px; }
 .bk-trust-s { font-size:10px; color:rgba(255,255,255,.45); line-height:1.6; }
 
-.bk-main { display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--bg); }
-.bk-mainTop { display:flex; align-items:center; justify-content:space-between; padding:18px 26px 0; }
-.bk-icon-btn { width:34px; height:34px; border:1px solid var(--bord); background:var(--bg-s); color:var(--fg2); font-size:13px; display:flex; align-items:center; justify-content:center; transition:color .2s,border-color .2s; }
-.bk-icon-btn:hover { color:var(--burg); border-color:var(--bordb); }
+/* the working pane: a warm wash, a progress line, then the step itself */
+.bk-main { display:flex; flex-direction:column; min-width:0; min-height:0;
+  background:radial-gradient(90% 50% at 100% 0%, rgba(184,149,74,.1), rgba(184,149,74,0) 70%), var(--bg); }
+.bk-mainTop { display:flex; align-items:center; justify-content:space-between; padding:20px 28px 0; }
+.bk-prog { height:3px; margin:16px 28px 0; border-radius:3px; background:rgba(110,20,35,.09); overflow:hidden; }
+.bk-prog i { display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,var(--gold-d),var(--gold) 60%,var(--gold-l)); transition:width .6s var(--ease); }
+.bk-icon-btn { width:38px; height:38px; border:1px solid var(--bord); border-radius:50%; background:#fff; color:var(--fg2); font-size:13px; display:flex; align-items:center; justify-content:center; transition:color .2s,border-color .2s,box-shadow .2s; }
+.bk-icon-btn:hover { color:var(--burg); border-color:var(--bordb); box-shadow:var(--lift-1); }
 .bk-icon-btn[hidden] { display:flex; visibility:hidden; }
-.bk-body { flex:1; overflow-y:auto; padding:10px 32px 24px; min-height:0; }
-.bk-h { font-family:var(--serif); font-size:clamp(25px,3.2vw,34px); font-weight:500; line-height:1.18; margin-bottom:8px; }
-.bk-h em { font-style:normal; color:var(--gold-d); display:block; }
-.bk-sub { font-size:13px; color:var(--fg2); line-height:1.7; margin-bottom:24px; max-width:460px; }
-.bk-grp { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--fg3); margin-bottom:10px; }
+.bk-body { flex:1; overflow-y:auto; padding:18px 36px 26px; min-height:0; }
+.bk-h { font-family:var(--serif); font-size:clamp(26px,3.3vw,36px); font-weight:500; line-height:1.15; margin-bottom:10px; }
+.bk-h em { font-style:normal; color:var(--burg); display:block; }
+.bk-sub { font-size:13.5px; color:var(--fg2); line-height:1.7; margin-bottom:26px; max-width:480px; }
+.bk-grp { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--fg2); margin-bottom:12px; }
 
-.bk-veh { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.bk-opt { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--bg-s); border:1.5px solid var(--bord); padding:18px 20px; cursor:pointer; text-align:start; transition:border-color .2s,background .2s; }
-.bk-opt:hover { border-color:var(--gold-d); }
-.bk-opt.sel { border-color:var(--burg); background:var(--burd); }
-.bk-opt > span:first-child { min-width:0; }
+/* step 1 — vehicle: two photo cards */
+.bk-veh { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.bk-opt { position:relative; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:0; padding:0; overflow:hidden; text-align:start; cursor:pointer;
+  background:#fff; border:1px solid var(--bord); border-radius:18px; box-shadow:var(--lift-1);
+  transition:transform .35s var(--ease), box-shadow .35s, border-color .3s; }
+.bk-opt:hover { transform:translateY(-3px); box-shadow:var(--lift-2); border-color:var(--gold-d); }
+.bk-opt.sel { border-color:var(--burg); box-shadow:0 0 0 2px var(--burg), var(--lift-2); }
+.bk-opt.sel::after { content:"✓"; position:absolute; top:12px; inset-inline-end:12px; z-index:2; width:26px; height:26px; border-radius:50%;
+  background:var(--burg); color:#fff; font-size:13px; display:flex; align-items:center; justify-content:center; }
+.bk-opt-img { display:block; background:linear-gradient(180deg,#FBF8F3,#EFE8DD); padding:16px 18px 6px; }
+.bk-opt-img img { width:100%; height:auto; display:block; }
+.bk-opt-txt { display:block; padding:14px 18px 16px; border-top:1px solid var(--bord); }
 .bk-opt-n { display:block; font-family:var(--serif); font-size:19px; }
 .bk-opt-s { display:block; font-size:11.5px; color:var(--fg3); margin-top:3px; }
-.bk-opt svg { color:var(--gold); flex-shrink:0; }
+.bk-note { display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--bordb); border-radius:14px; padding:12px 16px; font-size:12px; color:var(--fg2); margin-top:20px; }
+.bk-note::before { content:""; width:7px; height:7px; background:var(--gold); border-radius:50%; flex-shrink:0; }
 
-.bk-list { display:flex; flex-direction:column; gap:9px; }
-.bk-row { display:flex; align-items:center; gap:16px; background:var(--bg-s); border:1.5px solid var(--bord); padding:15px 18px; cursor:pointer; text-align:start; width:100%; transition:border-color .2s,background .2s; }
+/* step 2 — services: one row per service, ticked in place */
+.bk-list { display:flex; flex-direction:column; gap:10px; }
+.bk-row { display:flex; align-items:center; gap:16px; background:#fff; border:1px solid var(--bord); border-radius:16px; padding:16px 18px; width:100%; cursor:pointer; text-align:start;
+  transition:border-color .25s,background .25s,box-shadow .25s; }
 .bk-row:hover { border-color:var(--gold-d); }
-.bk-row.sel { border-color:var(--burg); background:var(--burd); }
-.bk-row-ic { color:var(--gold); flex-shrink:0; width:40px; height:40px; border:1px solid var(--bord); display:flex; align-items:center; justify-content:center; background:var(--bg); }
-.bk-check { flex-shrink:0; width:22px; height:22px; border:1.5px solid var(--bord); background:var(--bg); position:relative; transition:border-color .2s,background .2s; }
+.bk-row.sel { border-color:var(--burg); background:linear-gradient(90deg,rgba(110,20,35,.07),#fff 75%); box-shadow:0 10px 26px -18px rgba(110,20,35,.55); }
+.bk-check { flex-shrink:0; width:24px; height:24px; border:1.5px solid var(--bord); border-radius:50%; background:var(--bg); position:relative; transition:border-color .2s,background .2s; }
 .bk-row:hover .bk-check { border-color:var(--gold-d); }
 .bk-row.sel .bk-check { border-color:var(--burg); background:var(--burg); }
-.bk-row.sel .bk-check::after { content:""; position:absolute; left:7px; top:3px; width:5px; height:10px;
+.bk-row.sel .bk-check::after { content:""; position:absolute; left:8px; top:5px; width:5px; height:10px;
   border:solid #fff; border-width:0 2px 2px 0; transform:rotate(42deg); }
 .bk-row-main { flex:1; min-width:0; }
 .bk-row-n { font-family:var(--serif); font-size:19px; display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
-.bk-tag { font-family:var(--sans); font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; background:var(--burd); color:var(--burg); border:1px solid var(--bordb); padding:2px 7px; }
-.bk-row-d { display:block; font-size:11.5px; color:var(--fg2); line-height:1.5; margin-top:3px; }
+.bk-tag { font-family:var(--sans); font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; background:var(--burd); color:var(--burg); border:1px solid var(--bordb); border-radius:999px; padding:3px 9px; }
 .bk-row-h { display:block; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--fg3); margin-top:5px; }
 .bk-row-p { font-family:var(--serif); font-size:22px; color:var(--burg); white-space:nowrap; font-variant-numeric:lining-nums tabular-nums; }
 
-.bk-days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:26px; }
-.bk-day { background:var(--bg-s); border:1px solid var(--bord); padding:11px 2px 9px; cursor:pointer; text-align:center; transition:border-color .2s,background .2s,color .2s; }
-.bk-day:hover { border-color:var(--gold-d); }
-.bk-day.sel { border-color:var(--burg); background:var(--burg); }
+/* step 3 — when: a week of day tiles, then time pills grouped by part of day */
+.bk-days { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:26px; }
+.bk-day { background:#fff; border:1px solid var(--bord); border-radius:16px; padding:12px 2px 10px; cursor:pointer; text-align:center; transition:border-color .2s,background .2s,box-shadow .2s,transform .2s; }
+.bk-day:hover { border-color:var(--gold-d); transform:translateY(-2px); }
+.bk-day.sel { border-color:var(--burg); background:var(--burg); box-shadow:0 12px 22px -12px rgba(110,20,35,.7); }
 .bk-day-w { display:block; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--fg3); }
-.bk-day.sel .bk-day-w { color:rgba(255,255,255,.72); }
+.bk-day.sel .bk-day-w { color:rgba(255,255,255,.75); }
 .bk-day-d { display:block; font-family:var(--serif); font-size:22px; line-height:1.15; margin-top:3px; font-variant-numeric:lining-nums; }
 .bk-day.sel .bk-day-d { color:#fff; }
 .bk-per { margin-bottom:16px; }
 .bk-per:last-of-type { margin-bottom:0; }
 .bk-per-l { display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); margin-bottom:9px; }
-.bk-per-t { display:flex; flex-wrap:wrap; gap:7px; }
-.bk-time { background:var(--bg-s); border:1px solid var(--bord); padding:10px 19px; font-size:13px; cursor:pointer; color:var(--fg); transition:border-color .2s,background .2s,color .2s; font-variant-numeric:lining-nums tabular-nums; }
+.bk-per-t { display:flex; flex-wrap:wrap; gap:8px; }
+.bk-time { background:#fff; border:1px solid var(--bord); border-radius:999px; padding:10px 20px; font-size:13px; cursor:pointer; color:var(--fg);
+  transition:border-color .2s,background .2s,color .2s,box-shadow .2s; font-variant-numeric:lining-nums tabular-nums; }
 .bk-time:hover { border-color:var(--gold-d); }
-.bk-time.sel { border-color:var(--burg); background:var(--burg); color:#fff; }
-.bk-note { display:flex; align-items:center; gap:9px; background:var(--burd); border:1px solid var(--bordb); padding:11px 14px; font-size:11.5px; color:var(--fg2); margin-top:18px; }
-.bk-note::before { content:""; width:5px; height:5px; background:var(--gold); border-radius:50%; flex-shrink:0; }
+.bk-time.sel { border-color:var(--burg); background:var(--burg); color:#fff; box-shadow:0 10px 20px -12px rgba(110,20,35,.7); }
 .bk-sublbl { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
 
-.bk-card { background:var(--bg-s); border:1.5px solid var(--bord); margin-bottom:18px; }
-.bk-fld { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--bord); transition:background .2s; }
-.bk-fld:last-child { border-bottom:none; }
-.bk-fld-ic { color:var(--gold); flex-shrink:0; display:flex; }
-.bk-fld-in { flex:1; min-width:0; }
+/* step 4 — where: the address and the contact, one field per tile */
+.bk-card { display:flex; flex-direction:column; gap:10px; margin-bottom:22px; background:transparent; border:none; }
+.bk-fld { position:relative; display:block; padding:12px 16px 11px; background:#fff; border:1px solid var(--bord); border-radius:14px;
+  transition:border-color .2s,box-shadow .2s,background .2s; }
+.bk-fld:focus-within { border-color:var(--burg); box-shadow:0 0 0 4px rgba(110,20,35,.08); }
+.bk-fld label { display:block; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); margin-bottom:3px; }
 .bk-fld label i { font-style:normal; text-transform:none; letter-spacing:.04em; color:var(--fg3); }
-.bk-fld label { display:block; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); margin-bottom:2px; }
-.bk-fld input { width:100%; border:none; background:transparent; font-family:var(--sans); font-size:13px; color:var(--fg); outline:none; padding:0; }
-.bk-fld input:focus-visible { outline:2px solid var(--burg); outline-offset:2px; }
+.bk-fld:focus-within label { color:var(--burg); }
+.bk-fld input { width:100%; border:none; background:transparent; font-family:var(--sans); font-size:15px; color:var(--fg); outline:none; padding:0; }
 .bk-fld input::placeholder { color:var(--fg3); }
-.bk-fld.err { background:rgba(170,30,45,.055); }
+.bk-fld.err { border-color:rgba(170,30,45,.55); background:rgba(170,30,45,.04); }
 .bk-fld.err label { color:var(--burg); }
-.bk-row2 { display:grid; grid-template-columns:1fr 1fr; }
-.bk-row2 .bk-fld:first-child { border-inline-end:1px solid var(--bord); }
+.bk-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-/* an itemised receipt: a ruled header, the details, then one money column */
-.bk-receipt { position:relative; background:var(--bg-s); border:1px solid var(--bord); box-shadow:var(--lift-1); }
-.bk-receipt::after {
-  content:""; position:absolute; inset:7px; pointer-events:none;
-  border:1px solid rgba(184,149,74,.26);
-}
-.bk-rc-head {
-  display:flex; align-items:baseline; justify-content:space-between; gap:14px;
-  padding:20px 22px 16px; border-bottom:1px solid var(--bord);
-}
+/* step 5 — review: an itemised receipt, with the total set apart */
+.bk-receipt { position:relative; background:#fff; border:1px solid var(--bord); border-radius:20px; overflow:hidden; box-shadow:var(--lift-2); }
+.bk-receipt::after { content:""; position:absolute; inset:8px; border-radius:14px; pointer-events:none; border:1px solid rgba(184,149,74,.24); }
+.bk-rc-head { display:flex; align-items:baseline; justify-content:space-between; gap:14px; padding:20px 24px 16px; border-bottom:1px solid var(--bord); }
 .bk-rc-mark { font-family:var(--serif); font-size:17px; letter-spacing:.22em; color:var(--fg); }
 .bk-rc-sub  { font-size:8.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-d); }
-.bk-rc-items { padding:4px 22px 18px; border-top:1px solid var(--bord); }
+.bk-rc-items { padding:4px 24px 18px; border-top:1px solid var(--bord); }
 .bk-rc-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0 4px; }
 .bk-rc-top span { font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); }
 .bk-rc-item { display:flex; align-items:baseline; gap:10px; padding:8px 0; font-size:13px; }
@@ -823,9 +872,8 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .bk-rc-item > b { flex-shrink:0; font-weight:500; color:var(--fg); font-variant-numeric:lining-nums tabular-nums; }
 .bk-rc-item.muted > span, .bk-rc-item.muted > b { color:var(--fg3); }
 .bk-sum { background:transparent; border:none; margin-bottom:0; }
-.bk-sum-row { display:flex; align-items:center; gap:14px; padding:14px 22px; border-bottom:1px solid var(--bord); }
+.bk-sum-row { display:flex; align-items:center; gap:14px; padding:14px 24px; border-bottom:1px solid var(--bord); }
 .bk-sum-row:last-child { border-bottom:none; }
-.bk-sum-ic { color:var(--gold); flex-shrink:0; display:flex; }
 .bk-sum-main { flex:1; min-width:0; }
 .bk-sum-l { display:block; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); margin-bottom:3px; }
 .bk-sum-v { display:block; font-size:15px; }
@@ -836,23 +884,29 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
                color:var(--gold-d); font-variant-numeric:lining-nums tabular-nums; }
 .bk-edit { background:none; border:none; color:var(--fg3); font-size:10px; letter-spacing:.1em; text-transform:uppercase; transition:color .2s; flex-shrink:0; }
 .bk-edit:hover { color:var(--burg); }
-.bk-total { background:linear-gradient(140deg,#7A1828,#450D17); color:#fff; padding:22px; margin:0 7px 7px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.bk-total { background:linear-gradient(140deg,#7A1828,#450D17); color:#fff; padding:22px; margin:0 8px 8px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .bk-total-l { display:block; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:4px; }
 .bk-total-v { display:block; font-family:var(--serif); font-size:34px; font-variant-numeric:lining-nums tabular-nums; }
 .bk-total-s { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45); text-align:end; }
 
-.bk-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 32px; border-top:1px solid var(--bord); background:var(--bg-s); }
-.bk-bar-info { min-width:0; }
-.bk-bar-lbl { display:block; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg3); margin-bottom:2px; }
-.bk-bar-val { font-size:13px; }
-.bk-next { display:inline-flex; align-items:center; gap:9px; background:var(--burg); color:#fff; border:none; padding:15px 32px; font-size:10px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; transition:background .22s,opacity .22s; flex-shrink:0; }
-.bk-next:hover:not(:disabled) { background:var(--burg-h); }
-.bk-next:disabled { opacity:.38; cursor:not-allowed; }
-.bk-done { text-align:center; padding:30px 0 20px; }
-/* ── the printed receipt ──────────────────────────────────────────────── */
+/* the bottom bar: what is chosen so far, and the one button that moves on */
+.bk-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 28px; border-top:1px solid var(--bord); background:rgba(255,255,255,.94); }
+.bk-bar-info { min-width:0; flex:1; }
+.bk-bar-lbl { display:block; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--fg3); margin-bottom:3px; }
+.bk-bar-val { display:block; font-family:var(--serif); font-size:17px; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bk-next { display:inline-flex; align-items:center; gap:12px; background:var(--burg); color:#fff; border:none; border-radius:999px; padding:14px 28px; font-size:10.5px; font-weight:500; letter-spacing:.16em; text-transform:uppercase;
+  box-shadow:0 14px 26px -14px rgba(110,20,35,.8); transition:background .22s,opacity .22s,transform .2s,box-shadow .22s; flex-shrink:0; }
+.bk-next:hover:not(:disabled) { background:var(--burg-h); transform:translateY(-1px); }
+.bk-next:disabled { opacity:.38; cursor:not-allowed; box-shadow:none; }
+.bk-arrow { display:inline-block; }
+
+/* ── the printed receipt: the machine feeds it out of the slot ───────────── */
+.bk-done { text-align:center; padding:26px 0 20px; }
+.bk-done h3 { font-family:var(--serif); font-size:clamp(28px,3.4vw,38px); font-weight:400; margin-bottom:12px; }
+.bk-done p { font-size:15px; color:var(--fg2); line-height:1.8; max-width:400px; margin-inline:auto; }
 .pr-wrap { position:relative; width:min(304px,100%); margin:34px auto 0; }
-/* a bezel the paper comes OUT of: it overhangs the stock on both sides and has
-   a recessed mouth, so the sheet reads as emerging rather than stacked under a bar */
+/* the bezel the paper comes out of: it overhangs the stock on both sides and has a
+   recessed mouth, so the sheet reads as emerging from the machine */
 .pr-slot {
   position:relative; z-index:3; height:30px; margin-inline:-22px; border-radius:3px 3px 1px 1px;
   background:linear-gradient(180deg,#3A2A25 0%,#241A17 34%,#120C0B 62%,#1E1512 100%);
@@ -864,14 +918,20 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   background:#070404;
   box-shadow: inset 0 2px 3px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.07);
 }
-/* clipping and shadowing are split: clip-path would cut the paper's own shadow
-   away for the whole feed, so the wrapper clips and carries a filter shadow */
+/* a status light that blinks twice as the machine starts to print */
+.pr-slot::before {
+  content:""; position:absolute; top:9px; inset-inline-end:14px; width:6px; height:6px; border-radius:50%;
+  background:var(--gold-l); box-shadow:0 0 8px rgba(220,192,138,.9);
+  animation:prLed 1.2s ease-in-out .15s 2 both;
+}
+@keyframes prLed { 0%,100% { opacity:1; } 50% { opacity:.2; } }
+/* the feed clips the sheet at the mouth of the slot; the sheet itself slides down
+   out of it, so the receipt appears to be pushed out by the machine */
 .pr-feed {
   position:relative; z-index:2; margin-top:-10px; overflow:hidden;
+  /* clipping and shadowing are split: a clip-path would cut the paper's own shadow */
   filter:drop-shadow(0 10px 16px rgba(60,38,30,.28)) drop-shadow(0 2px 2px rgba(60,38,30,.16));
-  animation:prFeed 1.6s cubic-bezier(.22,.61,.36,1) .35s both;
 }
-@keyframes prFeed { from { clip-path:inset(0 0 100% 0); } to { clip-path:inset(0 0 0 0); } }
 .pr-paper {
   position:relative; text-align:start; padding:44px 26px 0;
   border-inline:1px solid rgba(86,52,40,.08);
@@ -881,7 +941,10 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
     linear-gradient(180deg, rgba(42,26,20,.26) 0, rgba(42,26,20,.11) 10px,
                             rgba(42,26,20,.035) 22px, rgba(42,26,20,0) 38px),
     linear-gradient(180deg,#FBF7F1 0,#FDFBF7 140px);
+  animation:prOut 2.4s cubic-bezier(.2,.7,.25,1) .3s both;
 }
+/* starts entirely behind the slot (its own height above the mouth), then feeds down */
+@keyframes prOut { from { transform:translateY(-101%); } to { transform:translateY(0); } }
 .pr-head { text-align:center; padding-bottom:15px; border-bottom:1px solid rgba(86,52,40,.28); }
 .pr-mark { display:block; font-family:var(--serif); font-size:25px; line-height:1;
   letter-spacing:.3em; text-indent:.3em; color:var(--fg); }
@@ -914,24 +977,24 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 /* punched holes with a tail of blank stock below, so there is something to tear */
 .pr-perf { margin:22px -26px 0; height:17px; border:0;
   background:radial-gradient(circle at 50% 0, var(--bg) 2.2px, transparent 2.35px) 0 0/9px 17px repeat-x; }
-@media(prefers-reduced-motion:reduce){ .pr-feed { animation:none; } }
+@media(prefers-reduced-motion:reduce){ .pr-paper { animation:none; } .pr-slot::before { animation:none; } }
 @media(max-width:480px){
   .pr-wrap { width:100%; }
   .pr-paper { padding:36px 20px 0; }
   .pr-perf { margin:22px -20px 0; }
 }
 
-.bk-done h3 { font-family:var(--serif); font-size:34px; font-weight:400; margin-bottom:12px; }
-.bk-done p { font-size:15px; color:var(--fg2); line-height:1.8; max-width:390px; margin-inline:auto; }
-
+/* ── responsive ─────────────────────────────────────────────────────────── */
 @media(max-width:860px){
-  .bk-modal { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); }
-  .bk-rail { padding:18px 20px; }
+  .bk-modal { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); border-radius:20px; }
+  .bk-rail { padding:16px 18px; }
   .bk-rail-h,.bk-rail-p,.bk-trust { display:none; }
-  .bk-rail-logo { margin-bottom:16px; }
+  .bk-rail-logo { margin-bottom:14px; }
   .bk-steps { flex-direction:row; gap:4px; }
-  .bk-steps li { flex-direction:column; gap:6px; flex:1; padding:8px 2px; font-size:10px; text-align:center; }
-  .bk-body { padding:10px 20px 20px; }
+  .bk-steps li { flex-direction:column; gap:6px; flex:1; padding:8px 2px; font-size:10px; text-align:center; border-radius:12px; }
+  .bk-mainTop { padding:16px 20px 0; }
+  .bk-prog { margin:12px 20px 0; }
+  .bk-body { padding:14px 22px 20px; }
   .bk-bar { padding:14px 20px; }
   .bk-veh { grid-template-columns:1fr 1fr; }
   .bk-days { grid-template-columns:repeat(4,1fr); }
@@ -940,10 +1003,9 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 @media(max-width:520px){
   .bk-veh { grid-template-columns:1fr; }
   .bk-row-d { display:none; }
-  .bk-next { padding:15px 18px; }
-  .bk-row-ic { display:none; }
+  .bk-next { padding:13px 20px; }
 }
-@media(prefers-reduced-motion:reduce){ .bk-overlay,.bk-modal{transition:none;} }
+@media(prefers-reduced-motion:reduce){ .bk-overlay,.bk-modal { transition:none; } .bk-prog i { transition:none; } }
 /* the nav row runs out of room on the narrowest phones */
 @media(max-width:360px){
   .nav-row { gap:10px; }
@@ -961,7 +1023,8 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
    panel to take less width and read as something hung, not pasted on */
 .ba-frame {
   margin: 0 auto;
-  max-width: 440px;
+  max-width: 640px;
+  width: 100%;
   padding: 16px;
   background: var(--bg-s);
   border: 1px solid var(--bord);
@@ -983,10 +1046,11 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 }
 .ba-nav:hover { background:var(--burg); border-color:var(--burg); opacity:1; }
 .ba-nav:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-.ba-prev { left:10px; } .ba-next { right:10px; }
+.ba-prev { inset-inline-start:10px; } .ba-next { inset-inline-end:10px; }
 .ba-cap {
   display:flex; align-items:center; justify-content:space-between; gap:12px;
-  margin-top:14px; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg2);
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--bord);
+  font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg2);
 }
 .ba-dots { display:flex; gap:6px; }
 .ba-dots button {
@@ -1029,15 +1093,17 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)) drop-shadow(0 9px 18px rgba(0,0,0,.5));
   scale: 1.06;
 }
-.ba-lbl {
-  position: absolute; bottom: 16px; z-index: 3; pointer-events: none;
-  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
-  padding: 7px 13px;
-  background: rgba(26,18,16,.76); color: #FBF7F1;
-  transition: opacity .3s;
+/* BEFORE / AFTER sit under the photograph, each under its own side of the divider */
+.ba-words {
+  display: flex; justify-content: space-between; direction: ltr;
+  margin-top: 14px;
+  font-size: 10.5px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--fg2);
 }
-.ba-lbl-b { left: 14px; }
-.ba-lbl-a { right: 14px; }
+.ba-word { display: inline-flex; align-items: center; gap: 8px; }
+.ba-word::before { content: ""; width: 7px; height: 7px; background: var(--fg3); }
+.ba-word-a { color: var(--burg); }
+.ba-word-a::before { background: var(--gold); }
 /* a full-bleed range input is the drag surface: pointer, touch and keyboard for free */
 .ba-range {
   position: absolute; inset: 0; z-index: 4; margin: 0;
@@ -1050,8 +1116,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .ba-range:focus-visible { outline: 2px solid var(--burg); outline-offset: -3px; opacity: 1; }
 @media (max-width: 540px) {
   .ba-grip { width: 38px; height: 38px; }
-  .ba-lbl { bottom: 10px; font-size: 8.5px; padding: 6px 10px; letter-spacing: .16em; }
-  .ba-lbl-b { left: 10px; } .ba-lbl-a { right: 10px; }
+  .ba-words { font-size: 9.5px; letter-spacing: .16em; }
 }
 
 /* the quiet line under the three cards */
@@ -1092,7 +1157,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   background:linear-gradient(90deg,var(--gold-d),var(--gold) 45%,var(--gold-l));
 }
 .pkg-badge {
-  position:absolute; top:22px; right:0; z-index:3;
+  position:absolute; top:22px; inset-inline-end:0; z-index:3;
   background:var(--burg); color:var(--gold-l);
   font-size:8.5px; font-weight:500; letter-spacing:.16em; text-transform:uppercase;
   padding:7px 14px;
@@ -1122,12 +1187,12 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 }
 .pkg-list { list-style:none; display:flex; flex-direction:column; gap:15px; flex:1; margin-bottom:32px; }
 .pkg-list li {
-  position:relative; padding-left:28px;
+  position:relative; padding-inline-start:28px;
   font-size:15px; color:#5C4F49; line-height:1.55;
 }
 /* a hand-drawn tick: a rotated corner, so no icon file and no stray glyph */
 .pkg-list li::before {
-  content:""; position:absolute; left:3px; top:6px;   /* optical centre of the line */
+  content:""; position:absolute; inset-inline-start:3px; top:6px;   /* optical centre of the line */
   width:5.5px; height:10px;
   border:solid var(--gold-d); border-width:0 1.5px 1.5px 0;
   transform:rotate(42deg);
@@ -1144,16 +1209,6 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 @media(max-width:960px){ .pkg-grid{grid-template-columns:1fr 1fr;} }
 @media(max-width:680px){ .pkg-grid{grid-template-columns:1fr;} .pkg{padding:34px 26px 28px;} }
 
-/* ══════════════════════════════
-   MODAL — photo vehicle cards, icon-free fields
-══════════════════════════════ */
-.bk-opt { flex-direction:column; align-items:stretch; justify-content:flex-start; gap:0; padding:0; overflow:hidden; }
-.bk-opt-img { display:block; background:var(--bg); padding:16px 18px 6px; }
-.bk-opt-img img { width:100%; height:auto; display:block; }
-.bk-opt-txt { display:block; padding:14px 18px 16px; border-top:1px solid var(--bord); }
-.bk-fld { display:block; padding:12px 16px; }
-.bk-done-rule { width:56px; height:1px; background:var(--gold); margin:0 auto 26px; }
-.bk-done p + .bk-done-rule { margin:26px auto 0; }
 
 /* ══════════════════════════════
    DOCKED CALL TO ACTION
@@ -1194,7 +1249,6 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
         <li><a href="#concept"  data-i18n="nav.about">About Us</a></li>
         <li><a href="#services" data-i18n="nav.packages">Packages</a></li>
         <li><a href="#why"      data-i18n="nav.why">Why Us</a></li>
-        <li><a href="#book"     data-i18n="nav.booking">Booking</a></li>
       </ul>
       <div class="nav-left">
         <div class="lang-toggle" role="group" aria-label="Language">
@@ -1216,7 +1270,6 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   <a href="#concept"  class="mm-link" data-i18n="nav.about">About Us</a>
   <a href="#services" class="mm-link" data-i18n="nav.packages">Packages</a>
   <a href="#why"      class="mm-link" data-i18n="nav.why">Why Us</a>
-  <a href="#book"     class="mm-link" data-i18n="nav.booking">Booking</a>
   <a href="#footer"   class="mm-link" data-i18n="nav.contact">Contact</a>
   <button class="mm-btn" data-book="1" data-closemenu="1" data-i18n="btn.book">Book Now</button>
 </div>
@@ -1253,12 +1306,14 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
         <div class="ba" id="ba">
           <img class="ba-img" id="baAfter" src="g1-after.webp" alt="A BMW M4 after an Overa detail — gloss restored" width="900" height="600" loading="lazy" decoding="async">
           <img class="ba-img ba-before" id="baBefore" src="g1-before.webp" alt="The same car before: paint dulled by dust and road film" width="900" height="600" loading="lazy" decoding="async">
-          <span class="ba-lbl ba-lbl-b" data-i18n="ba.before">Before</span>
-          <span class="ba-lbl ba-lbl-a" data-i18n="ba.after">After</span>
           <span class="ba-line"><span class="ba-grip"></span></span>
           <input class="ba-range" id="baRange" type="range" min="4" max="96" value="96" step="0.1" aria-label="Drag to compare before and after">
           <button type="button" class="ba-nav ba-prev" id="baPrev" aria-label="Previous">&#8249;</button>
           <button type="button" class="ba-nav ba-next" id="baNext" aria-label="Next">&#8250;</button>
+        </div>
+        <div class="ba-words">
+          <span class="ba-word ba-word-b" data-i18n="ba.before">Before</span>
+          <span class="ba-word ba-word-a" data-i18n="ba.after">After</span>
         </div>
         <figcaption class="ba-cap"><span id="baCap"></span>
           <span class="ba-dots" id="baDots"></span></figcaption>
@@ -1352,6 +1407,11 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
       <h2 data-i18n="book.h2">Bring the Studio to Your Door</h2>
       <p data-i18n="book.p">Choose a time that suits your day. We confirm within the hour.</p>
     </div>
+    <ul class="book-perks">
+      <li><span class="bp-n">01</span><b data-i18n="bp1.t">Keep your day</b><span data-i18n="bp1.d">We come to you. No drive, no drop-off.</span></li>
+      <li><span class="bp-n">02</span><b data-i18n="bp2.t">Showroom finish</b><span data-i18n="bp2.d">Sealed, dust-free studio. Swirl-free paint.</span></li>
+      <li><span class="bp-n">03</span><b data-i18n="bp3.t">Pay after the work</b><span data-i18n="bp3.d">Nothing is charged until the job is done.</span></li>
+    </ul>
     <div class="book-cta-wrap">
       <button class="btn-primary book-open" id="bookOpen">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1425,6 +1485,7 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
         <button class="bk-icon-btn bk-back" id="bkBack" aria-label="Back" hidden>&#8592;</button>
         <button class="bk-icon-btn bk-close" id="bkClose" aria-label="Close">&#10005;</button>
       </div>
+      <div class="bk-prog" aria-hidden="true"><i id="bkProg"></i></div>
       <div class="bk-body" id="bkBody"></div>
       <div class="bk-bar" id="bkBar">
         <div class="bk-bar-info">
@@ -1724,255 +1785,213 @@ const T = {
     'book.h2':'Bring the Studio to Your Door',
     'book.p':'Choose a time that suits your day. We confirm within the hour.',
     'book.label':'Reserve Your Service',
+    'bp1.t':'Keep your day','bp1.d':'We come to you. No drive, no drop-off.',
+    'bp2.t':'Showroom finish','bp2.d':'Sealed, dust-free studio. Swirl-free paint.',
+    'bp3.t':'Pay after the work','bp3.d':'Nothing is charged until the job is done.',
   },
   ar: {
-    'brand.name':'أوفيرا','brand.sub':'للعناية بالسيارات','nav.home':'الرئيسية','nav.services':'الخدمات','nav.packages':'الباقات','nav.booking':'الحجز','nav.about':'من نحن','nav.contact':'تواصل معنا','nav.process':'الطريقة','nav.why':'لماذا أوفيرا',
-    'hero.eyebrow':'أوفيرا · عمّان، الأردن','hero.h1':'المعرض<br>يأتي إليك','hero.p':'أول استوديو عناية متنقل ومغلق بالكامل في الأردن. نصل إلى بابك، وننصب فقاعة محكمة بطول سبعة أمتار، ونعيد سيارتك إلى حالة المعرض — دون أن تتحرك خطوة واحدة.','hero.imgNote':'استبدل بصورة السيارة',
-    'btn.book':'احجز الآن','btn.explore':'استعرض الخدمات','btn.bookpkg':'احجز هذه الباقة','btn.continue':'متابعة ←','btn.back':'→ رجوع','btn.confirm':'تأكيد الحجز',
-    'feat.protection':'حماية<br>طويلة الأمد','feat.finish':'لمسة<br>المعرض','feat.care':'عناية شاملة<br>بالسيارة',
-    'stat.cars':'سيارة تم تلميعها','stat.satisfaction':'نسبة رضا العملاء','stat.packages':'باقات فاخرة','stat.services':'خدمة متخصصة',
-    'concept.width':'العرض 7 م','concept.height':'2.1 م','concept.label':'التجربة','concept.h2':'استوديو خاص عند بابك','concept.p1':'يصل فريقنا بفقاعة متنقلة مغلقة بالكامل — سبعة أمتار طولاً، وأربعة عرضاً، وأكثر من مترين ارتفاعاً. داخلها تُعزل سيارتك عن غبار عمّان ورياحها وشمسها، في مساحة محكمة مضاءة للعمل الدقيق.','concept.p2':'هذا ما يفصلنا عن أي مغسلة. الغبار عدو اللمعان: ذرة واحدة عالقة تمر على الطلاء تحت آلة التلميع تترك خدشاً دائرياً تراه مع كل غروب. الفقاعة تُلغي هذا الاحتمال تماماً.','concept.p3':'كل فني لدينا مدرَّب على تصحيح الطلاء والحماية السيراميكية، ولا يعمل إلا بمنتجات فاخرة معتمدة، ويتعامل مع سيارتك كما يتعامل صانع الساعات مع حركتها — بصبر، وفي غرفة نظيفة.',
-    'pill.dust':'بيئة خالية من الغبار','pill.weather':'مقاومة للطقس','pill.pro':'معايير احترافية','pill.mobile':'استوديو متنقل',
-    'services.label':'باقاتنا','services.h2':'مصممة لسيارتك','services.p':'اختر نوع سيارتك أدناه. تُنفَّذ جميع الخدمات داخل فقاعتنا المتنقلة في الموقع الذي تختاره.',
-    'toggle.sedan':'سيدان / هاتشباك','toggle.suv':'دفع رباعي / 4×4','pkg.essential':'الأساسية','pkg.prestige':'البريستيج','pkg.signature':'السيغنتشر',
-    'f.wash':'غسيل خارجي يدوي','f.rim':'تلميع الإطارات والجنوط','f.window':'تلميع الزجاج','f.vac':'شفط داخلي','f.dash':'تنظيف لوحة القيادة',
-    'f.ess':'كل ما في الأساسية','f.clay':'معالجة كلاي بار','f.int':'تنظيف داخلي كامل','f.leath':'تلميع وترطيب الجلد','f.leath2':'العناية بالجلد والقماش','f.odor':'إزالة الروائح',
-    'f.pres':'كل ما في البريستيج','f.paint':'تصحيح وتلميع الطلاء','f.cer':'طبقة سيراميك','f.eng':'تنظيف حجرة المحرك','f.full':'خدمة يوم كامل',
-    'how.label':'الطريقة','how.h2':'أربع خطوات للكمال',
-    'step1.ttl':'احجز عبر الإنترنت','step1.dsc':'اختر نوع سيارتك، حدد الباقة، وحدد الموعد — في أقل من دقيقتين.',
-    'step2.ttl':'نصل إليك','step2.dsc':'يتوجه فريقنا إلى موقعك بكامل المعدات بما في ذلك الفقاعة المتنقلة.',
-    'step3.ttl':'نصب الفقاعة','step3.dsc':'نقوم بنشر فقاعة الاستوديو المحكمة حول سيارتك لتوفير بيئة خالية من الغبار.',
-    'step4.ttl':'نتيجة مثالية','step4.dsc':'تُلمَّع سيارتك بأعلى معايير الجودة. نحزم معداتنا وتستمتع أنت بالنتيجة.',
-    'book.label':'احجز خدمتك','book.h2':'احجز موعداً','book.p':'اختر نوع سيارتك، حدد الباقة، وأدخل تفاصيلك. سنؤكد الحجز خلال الساعة.',
-    'trk.vehicle':'السيارة','trk.package':'الباقة','trk.details':'التفاصيل','car.sedan':'سيدان','car.hatch':'وهاتشباك','car.suv':'دفع رباعي','car.4x4':'و4×4',
-    'field.name':'الاسم الكامل','field.phone':'رقم الجوال','field.addr':'عنوانك','field.date':'التاريخ المفضل','field.time':'الوقت المفضل','field.timeDefault':'اختر الوقت','field.note':'ملاحظات (اختياري)',
-    'time.morning':'صباحاً (8ص – 12م)','time.afternoon':'ظهراً (12م – 5م)','time.evening':'مساءً (5م – 9م)',
-    'thanks.h3':'تم استلام الحجز','thanks.p':'شكراً لاختيارك أوفيرا. سيتواصل معك فريقنا خلال الساعة لتأكيد الموعد.',
-    'why.label':'لماذا أوفيرا','why.h2':'لماذا يختارنا عملاؤنا',
-    'why1.ttl':'نأتي إليك','why1.dsc':'في المنزل أو المكتب أو موقف المبنى. تسلّمنا المفتاح وتكمل يومك — لا توصيل ولا استلام.',
-    'why2.ttl':'غرفة محكمة','why2.dsc':'سبعة أمتار من مساحة عمل مغلقة ومفلترة: لا غبار يستقر على الشمع الطازج، ولا رياح تحمل الأتربة إلى طلاء مبلل. ظروف معرض أينما ركنت.',
-    'why3.ttl':'مواد معتمدة','why3.dsc':'رغوة متعادلة الحموضة، وصلصال ياباني، وطبقات سيراميك تدوم سنوات لا أسابيع — آمنة على الأغلفة المطفأة والكربون والدهانات الدقيقة.',
-    'why4.ttl':'عمل مضمون','why4.dsc':'نصوّر كل سيارة قبل وبعد. وإن قصّر أي تفصيل عمّا وعدنا به، نعود ونصححه على حسابنا.',
-    'footer.about':'عناية متنقلة فاخرة بالسيارات تُقدَّم عند بابك.','footer.nav':'التنقل','footer.contact':'تواصل معنا','footer.city':'عمّان، الأردن',
-    'footer.copy':'© {y} أوفيرا للعناية بالسيارات. جميع الحقوق محفوظة.','footer.motto':'نظف · احمِ · احفظ','pkg.featured':'الأكثر طلباً',
-    'services.label':'خدماتنا',
-    'services.h2':'كل ما تحتاجه سيارتك',
-    'services.p':'تسع خدمات، تُنفَّذ كلها داخل الفقاعة المتنقلة المحكمة عند عنوانك. الأسعار المعروضة للسيدان — المركبات الأكبر عليها فرق بسيط يظهر عند الحجز.',
-    'btn.booksvc':'احجز هذه الخدمة',
-    'price.from':'تبدأ من',
-    'cur':'د.أ',
-    'book.label':'احجز خدمتك',
-    'book.h2':'احجز موعداً',
-    'book.p':'خمس خطوات هادئة: أخبرنا بسيارتك، اختر الخدمة، ثم الوقت والعنوان. نؤكد خلال ساعة.',
-    'assur.insured':'مؤمَّن بالكامل',
-    'assur.come':'نأتي إليك',
-    'assur.nopay':'لا دفع عبر الإنترنت',
-    'bk.railH':'احجز عنايتك في خمس خطوات هادئة.',
-    'bk.railP':'عناية فاخرة مجدولة حول يومك. نحضر الاستوديو إلى بابك.',
+    'ba.after':'بعد',
+    'ba.before':'قبل',
+    'bar.svc':'الخدمة',
+    'bar.veh':'السيارة المختارة',
+    'bar.when':'الموعد',
+    'bar.where':'الموقع',
+    'bk.addAddr':'أضف عنوانك',
+    'bk.addr':'عنوان الخدمة',
+    'bk.aft':'بعد الظهر',
+    'bk.confirm':'تأكيد الحجز',
+    'bk.contact':'بيانات التواصل',
+    'bk.continue':'متابعة',
+    'bk.doneH':'تم استلام حجزك.',
+    'bk.doneP':'حجزنا لك يوم {d} الساعة {t}. سيتصل بك فريقنا قريباً ليؤكد العنوان ويجيب عن أي استفسار.',
+    'bk.edit':'تعديل',
+    'bk.eve':'مساءً',
+    'bk.free':'مجاناً',
+    'bk.from':'تبدأ من',
+    'bk.h1a':'لنبدأ',
+    'bk.h1b':'بسيارتك',
+    'bk.h2a':'اختر',
+    'bk.h2b':'خدمتك',
+    'bk.h3a':'اختر',
+    'bk.h3b':'موعدك المناسب',
+    'bk.h4a':'أين نصل',
+    'bk.h4b':'إليك؟',
+    'bk.h5a':'راجع',
+    'bk.h5b':'وأكّد حجزك',
+    'bk.items':'التفاصيل',
+    'bk.morn':'صباحاً',
+    'bk.nSel':'{n} خدمات',
+    'bk.noSlots':'لا توجد مواعيد متاحة في هذا اليوم، فاختر يوماً آخر.',
+    'bk.nosur':'بدون رسوم إضافية',
+    'bk.note1':'تحتاج الفقاعة إلى مساحة مستوية بمقاس 7 × 4 أمتار بجانب سيارتك.',
+    'bk.optional':'(اختياري)',
+    'bk.pickDate':'اختر تاريخاً',
+    'bk.popular':'الأكثر حجزاً',
+    'bk.prFoot':'لا يُحصَّل أي مبلغ قبل إتمام العمل',
+    'bk.prItems':'الخدمة',
+    'bk.prSub':'إيصال الحجز',
+    'bk.railH':'احجز عنايتك في دقائق.',
+    'bk.railP':'عناية فاخرة تُجدول حول يومك. نحضر الاستوديو إلى بابك.',
     'bk.s1':'السيارة',
     'bk.s2':'الخدمة',
     'bk.s3':'الموعد',
     'bk.s4':'الموقع',
     'bk.s5':'المراجعة',
-    'bk.trustT':'يثق بنا أكثر من ٥٠٠ مالك',
-    'bk.trustS':'فقاعة محكمة · التزام بالموعد · منتجات معتمدة',
-    'bk.h1a':'لنبدأ',
-    'bk.h1b':'بسيارتك',
-    'bk.sub1':'أخبرنا بما تقود — الحجم والتشطيب يحددان المواد والوقت الذي نخصصه.',
-    'bk.h2a':'اختر',
-    'bk.h2b':'خدمتك',
-    'bk.sub2':'اختر خدمة واحدة أو أكثر — تُنفَّذ تباعًا في الزيارة نفسها.',
-    'bk.nSel':'{n} خدمات',
-    'bk.h3a':'اختر',
-    'bk.h3b':'الوقت المناسب',
-    'bk.sub3':'اختر موعداً — يصل فريقنا خلال تلك الساعة.',
-    'bk.h4a':'أين',
-    'bk.h4b':'نلتقي بك؟',
-    'bk.sub4':'عنوانك ورقم للتواصل. هذا كل شيء.',
-    'bk.h5a':'مراجعة',
-    'bk.h5b':'وتأكيد',
-    'bk.sub5':'نظرة أخيرة — لا يُستوفى أي مبلغ قبل إتمام العمل.',
-    'bk.nosur':'بدون فرق',
-    'bk.popular':'الأكثر طلباً',
-    'bk.note1':'تحتاج الفقاعة إلى مساحة مستوية بحدود ٧ × ٤ أمتار بجانب سيارتك.',
+    'bk.save':'حفظ التغييرات',
     'bk.selDate':'اختر التاريخ',
     'bk.selTime':'اختر الوقت',
-    'bk.tz':'بتوقيت عمّان',
-    'bk.today':'اليوم',
-    'bk.window':'يصل فريقنا خلال الساعة المختارة ويجهّز خلال ٢٠ دقيقة تقريباً.',
-    'bk.addr':'عنوان الخدمة',
-    'bk.contact':'بيانات التواصل',
-    'fld.street':'الشارع',
-    'fld.area':'المنطقة',
-    'fld.city':'المدينة',
-    'fld.bldg':'المبنى / الشقة',
-    'fld.name':'الاسم الكامل',
-    'fld.phone':'الهاتف',
-    'fld.email':'البريد (اختياري)',
-    'ph.street':'اسم الشارع',
-    'ph.area':'عبدون، دير غبار…',
-    'ph.city':'عمّان',
-    'ph.bldg':'مبنى ١٢، شقة ٤',
-    'ph.name':'اسمك',
-    'ph.phone':'07 9XXX XXXX',
-    'ph.email':'you@example.com',
-    'bk.sum.veh':'السيارة',
+    'bk.sub1':'أخبرنا بما تقود. حجم السيارة وتشطيبها يحددان المنتجات والوقت الذي نخصصه لها.',
+    'bk.sub2':'اختر خدمة واحدة أو أكثر، وتُنفَّذ كلها في الزيارة نفسها.',
+    'bk.sub3':'اختر موعداً، ويصل فريقنا خلال تلك الساعة.',
+    'bk.sub4':'عنوانك ورقم هاتفك، وهذا كل ما نحتاجه.',
+    'bk.sub5':'نظرة أخيرة. لا يُستوفى أي مبلغ قبل إتمام العمل.',
     'bk.sum.svc':'الخدمة',
+    'bk.sum.veh':'السيارة',
     'bk.sum.when':'التاريخ والوقت',
     'bk.sum.where':'العنوان',
     'bk.sum.who':'التواصل',
-    'bk.edit':'تعديل',
+    'bk.surcharge':'رسوم المركبة',
+    'bk.today':'اليوم',
     'bk.total':'الإجمالي',
-    'bk.totalNote':'الدفع بعد إنجاز العمل',
-    'bk.save':'حفظ التغييرات',
-    'bk.items':'التفصيل',
-    'bk.confirm':'تأكيد الحجز',
-    'bk.continue':'متابعة',
-    'bk.prSub':'إيصال الحجز','bk.prFoot':'لا يُحصَّل أي مبلغ قبل إتمام العمل',
-    'bk.prItems':'الخدمة','bk.surcharge':'رسوم المركبة',
-    'bk.doneH':'تم تثبيت حجزك.',
-    'bk.doneP':'حجزنا لك {d} الساعة {t}. سيتصل بك فريقنا قريباً لتأكيد العنوان والإجابة عن أي استفسار.',
-    'bar.veh':'السيارة المختارة',
-    'bar.svc':'الخدمة',
-    'bar.when':'الموعد',
-    'bar.where':'الموقع',
-    'bk.pickDate':'اختر تاريخاً',
-    'bk.addAddr':'أضف عنوانك',
-    'veh.sedan.n':'سيدان / هاتشباك',
-    'veh.suv.n':'دفع رباعي',
-    'veh.pickup.n':'بيك أب / فان',
-    'veh.exotic.n':'كوبيه / رياضية',
-    'svc.dryclean.n':'تنظيف جاف',
-    'svc.dryclean.d':'تنظيف خارجي وداخلي بلا ماء، يرفع الغبار دون قطرة واحدة.',
-    'svc.dryclean.h':'ساعة ونصف – ساعتان',
-    'svc.polish.n':'تلميع',
-    'svc.polish.d':'تلميع آلي يعيد العمق واللمعان إلى طلاء باهت ومخدوش.',
-    'svc.polish.h':'ساعتان – ٣ ساعات',
-    'svc.interior.n':'تجديد المقصورة',
-    'svc.interior.d':'تنظيف عميق للمفروشات، وتغذية الجلد، وإحياء كامل للمقصورة.',
-    'svc.interior.h':'٣ – ٤ ساعات',
-    'svc.tint.n':'تظليل زجاج',
-    'svc.tint.d':'فيلم عازل للحرارة مقصوص على زجاجك، يُركَّب داخل فقاعة محكمة خالية من الغبار.',
-    'svc.tint.h':'ساعتان – ٣ ساعات',
-    'svc.refine.n':'تصحيح الطلاء',
-    'svc.refine.d':'تصحيح متعدد المراحل يزيل الخدوش الدائرية والتآكل والأكسدة.',
-    'svc.refine.h':'٥ – ٧ ساعات',
-    'svc.aero.n':'طلاء أيرو',
-    'svc.aero.d':'طبقة طاردة للماء بمواصفات الطيران — الماء ينزلق، والأوساخ لا تثبت.',
-    'svc.aero.h':'٣ – ٤ ساعات',
-    'svc.ceramic.n':'نانو سيراميك',
-    'svc.ceramic.d':'درع سيراميكي يلتحم بطبقة الحماية، يدوم سنوات لا أشهر.',
-    'svc.ceramic.h':'يوم – يومان',
-    'svc.graphene.n':'طلاء جرافين',
-    'svc.graphene.d':'حمايتنا الأعلى: لمعان أعمق، وتشتيت أفضل للحرارة، وعمر أطول.',
-    'svc.graphene.h':'يوم – يومان',
-    'svc.ppf.n':'فيلم حماية الطلاء',
-    'svc.ppf.d':'فيلم ذاتي الالتئام على مقدمة السيارة — الحصى يتوقف قبل أن يصل الطلاء.',
-    'svc.ppf.h':'يومان – ٣ أيام',
-    'services.label':'باقاتنا',
-    'services.h2':'ثلاث طرق نحمي بها سيارتك',
-    'services.p':'كل خدمة تُنفَّذ داخل الفقاعة المحكمة عند عنوانك. اختر من أين تبدأ — وفريقنا ينصحك بالباقي على أرض الواقع.',
-    'services.foot':'لست متأكداً ما الذي تحتاجه سيارتك؟',
+    'bk.trustS':'فقاعة محكمة · وصول في الموعد · منتجات معتمدة',
+    'bk.trustT':'يثق بنا أكثر من 500 مالك',
+    'bk.tz':'بتوقيت عمّان',
+    'bk.window':'يصل فريقنا خلال الساعة المختارة، ويجهّز الفقاعة خلال 20 دقيقة تقريباً.',
+    'bk.yourPkg':'باقتك',
+    'book.h2':'الاستوديو يصل إلى بابك',
+    'book.label':'احجز خدمتك',
+    'book.p':'اختر الوقت الذي يناسب يومك، ونؤكد حجزك خلال ساعة.',
+    'bp1.d':'نأتي إليك، فلا قيادة ولا توصيل.',
+    'bp1.t':'وفّر وقتك',
+    'bp2.d':'استوديو محكم خالٍ من الغبار، وطلاء بلا خدوش دائرية.',
+    'bp2.t':'لمسة المعرض',
+    'bp3.d':'لا يُحصَّل أي مبلغ قبل إتمام العمل.',
+    'bp3.t':'ادفع بعد الإنجاز',
+    'brand.name':'أوفيرا',
+    'brand.sub':'للعناية بالسيارات',
+    'btn.book':'احجز الآن',
+    'btn.bookpkg':'احجز هذه الباقة',
     'btn.contact':'تواصل معنا',
-    'ct.label':'تواصل معنا','ct.h':'أخبرنا عن سيارتك',
-    'ct.p':'اترك بياناتك وسنتصل بك.',
-    'ct.name':'الاسم','ct.veh':'فئة السيارة','ct.phone':'رقم الهاتف','ct.choose':'اختر…',
-    'ct.err':'يرجى تعبئة الحقول الثلاثة.','ct.send':'إرسال',
-    'ct.doneH':'شكراً لك','ct.doneP':'وصلتنا بياناتك وسنتصل بك قريباً.',
-    'btn.advise':'احجز معاينة مجانية',
-    'pil.protect.n':'الحماية',
-    'pil.protect.t':'درع لا تراه.',
-    'pil.protect.d':'سيراميك وجرافين وفيلم حماية — قشرة صلبة غير مرئية تلتحم بطلائك. الحصى يتوقف عند الفيلم. الشمس تتوقف عند الطبقة. والماء يغادر حاملاً الغبار معه.',
-    'pil.protect.i':'نانو سيراميك · جرافين · فيلم حماية الطلاء · طلاء أيرو',
-    'pil.protect.c':'احجز الحماية',
-    'pil.refine.n':'التصحيح',
-    'pil.refine.t':'الطلاء كما غادر المصنع.',
-    'pil.refine.d':'تصحيح متعدد المراحل تحت إضاءة محكمة. تُرفع الخدوش الدائرية والتآكل والأكسدة طبقة بعد طبقة، حتى يعود السطح قطعة واحدة بلا انقطاع.',
-    'pil.refine.i':'تصحيح الطلاء · تلميع آلي',
-    'pil.refine.c':'احجز التصحيح',
-    'pil.care.n':'العناية',
-    'pil.care.t':'نقاء من الداخل والخارج.',
-    'pil.care.d':'تنظيف خارجي بلا ماء، واستخلاص عميق للمقصورة، وتغذية الجلد، وتظليل الزجاج. العناية المنتظمة التي تُطيل عمر كل ما سبق.',
-    'pil.care.i':'تنظيف جاف · تجديد المقصورة · تظليل زجاج',
-    'pil.care.c':'احجز العناية',
-    'how.p':'من ضغطة زر إلى نتيجة بلا عيب، دون أن تغادر البيت.',
-    'step1.ttl':'احجز أونلاين',
-    'step1.dsc':'اختر سيارتك وخدمتك — الحجز كله يستغرق دقيقتين.',
-    'step2.ttl':'نصل إليك',
-    'step2.dsc':'تصل مركبتنا إلى عنوانك بالاستوديو وكل المنتجات.',
-    'step3.ttl':'تُنصب الفقاعة',
-    'step3.dsc':'سبعة أمتار من مساحة محكمة ومفلترة ومضاءة — جاهزة خلال عشرين دقيقة.',
-    'step4.ttl':'تُسلَّم بلا عيب',
-    'step4.dsc':'نجمع معداتنا ونغادر. تخرج إلى سيارة تبدو جديدة.',
-    'concept.h2':'بابك. استوديونا.',
-    'concept.p1':'تُنصب فقاعة محكمة بجانب سيارتك — سبعة أمتار من مساحة مفلترة ومضاءة وخالية من الغبار. ظروف صالة التلميع، عند عنوانك.',
-    'concept.p2':'لا غبار. لا رياح. لا قيادة عبر عمّان. فقط سيارتك، تُعاد إليك بلا عيب.',
-    'concept.cap':'٧ × ٤ × ٢٫١ م — محكمة، مفلترة، مضاءة',
-    'veh.sedan.n':'سيدان / هاتشباك / رياضية',
-    'veh.suv.n':'دفع رباعي / SUV',
-    'hero.p':'تُنصب بجانب سيارتك فقاعة محكمة بطول سبعة أمتار — مفلترة، مضاءة، بلا غبار. يصحّح فريقنا الطلاء ويحميه ويعتني بالمقصورة في مكانها، وأنت لا تغادر بابك.',
-    'hero.cap':'٧ × ٤ × ٢٫١ م · محكمة، مفلترة، مضاءة',
-    'hs1.t':'احجز أونلاين',
-    'hs1.d':'اختر الخدمة والموعد اللذين يناسبانك.',
-    'hs2.t':'نصل إليك',
-    'hs2.d':'تصل مركبتنا إلى عنوانك في موعدها.',
-    'hs3.t':'تُنصب الفقاعة',
-    'hs3.d':'سبعة أمتار محكمة، تُنصب في عشرين دقيقة.',
-    'hs4.t':'تُسلَّم بلا عيب',
-    'hs4.d':'سيارتك، تعود إلى حالة المعرض.',
-    'concept.p1':'تصحيح الطلاء، والسيراميك، وفيلم الحماية — تُنفَّذ في الظروف المحكمة ذاتها التي تعمل بها صالات التلميع، عند عنوانك.',
-    'concept.cap':'تُعاد إليك بمعيار المعرض',
+    'btn.packages':'تصفّح الباقات',
+    'concept.h2':'بابك، واستوديونا',
+    'concept.p1':'تصحيح الطلاء والسيراميك وحماية الفيلم، بالظروف المحكمة نفسها التي تعمل بها صالات التلميع، لكن عند عنوانك.',
+    'concept.p2':'لا غبار، ولا رياح، ولا قيادة عبر عمّان. سيارتك وحدها، تعود إليك بلا عيب.',
+    'ct.choose':'اختر…',
+    'ct.doneH':'شكراً لك',
+    'ct.doneP':'وصلتنا بياناتك وسنتصل بك قريباً.',
+    'ct.err':'يرجى تعبئة الحقول الثلاثة.',
+    'ct.h':'أخبرنا عن سيارتك',
+    'ct.label':'تواصل معنا',
+    'ct.name':'الاسم',
+    'ct.p':'اترك بياناتك وسنعاود الاتصال بك.',
+    'ct.phone':'رقم الهاتف',
+    'ct.send':'إرسال',
+    'ct.veh':'فئة السيارة',
+    'cur':'د.أ',
+    'fld.area':'المنطقة',
+    'fld.bldg':'المبنى / الشقة',
+    'fld.city':'المدينة',
+    'fld.email':'البريد الإلكتروني (اختياري)',
+    'fld.name':'الاسم الكامل',
+    'fld.phone':'رقم الهاتف',
+    'fld.street':'الشارع',
+    'footer.about':'خدمة عناية متنقلة وفاخرة بالسيارات، تُقدَّم عند بابك.',
+    'footer.city':'عمّان، الأردن',
+    'footer.contact':'تواصل معنا',
+    'footer.copy':'© {y} أوفيرا للعناية بالسيارات. جميع الحقوق محفوظة.',
+    'footer.motto':'نظّف · احمِ · صُن',
+    'footer.nav':'الروابط',
+    'hero.h1':'المعرض<br>يأتي إليك',
+    'hero.p':'استوديو محكم عند بابك، وسيارتك تعود إليك بلا عيب.',
+    'nav.about':'من نحن',
+    'nav.booking':'الحجز',
+    'nav.contact':'تواصل معنا',
+    'nav.home':'الرئيسية',
     'nav.packages':'الباقات',
     'nav.why':'لماذا أوفيرا',
-    'hero.p':'استوديو محكم عند بابك. وسيارتك تُعاد إليك بلا عيب.',
-    'btn.packages':'تصفّح الباقات',
-    'btn.bookpkg':'احجز هذه الباقة',
-    'pkg.popular':'الأكثر طلباً',
-    'ba.cap.front':'الأمام · الطلاء والزجاج','ba.cap.back':'الخلف · الطلاء والزجاج',
-    'ba.cap.wheel':'الجنط والإطار','ba.cap.cabin':'المقصورة · المقاعد والتابلوه والمقود',
-    'ba.before':'قبل',
-    'ba.after':'بعد',
-    'services.h2':'اختر باقتك',
-    'services.p':'ثلاث طرق للبدء — جميعها تُنفَّذ داخل الاستوديو المحكم عند عنوانك.',
-    'services.foot':'لست متأكداً أي باقة تناسب سيارتك؟',
-    'book.kicker':'عمّان · مواعيد ضمن الأسبوع',
-    'book.h2':'أحضر الاستوديو إلى بابك',
-    'book.p':'اختر الوقت الذي يناسب يومك. نؤكد حجزك خلال ساعة.',
-    'bk.railH':'حجزك يكتمل في دقائق.',
-    'bk.yourPkg':'باقتك',
-    'bk.optional':'(اختياري)',
-    'bk.free':'مجاناً',
-    'svc.assess.n':'معاينة مجانية',
-    'svc.assess.d':'يعاين مختصنا السيارة عند عنوانك ويوصي بالباقة المناسبة. بلا رسوم وبلا التزام.',
-    'svc.assess.h':'٣٠ دقيقة',
-    'bk.from':'تبدأ من',
-    'bk.totalFrom':'سعر مبدئي — يُؤكَّد عند المعاينة',
+    'ph.area':'عبدون، دير غبار…',
+    'ph.bldg':'مبنى 12، شقة 4',
+    'ph.city':'عمّان',
+    'ph.email':'you@example.com',
+    'ph.name':'اسمك الكامل',
+    'ph.phone':'07 9XXX XXXX',
+    'ph.street':'اسم الشارع',
+    'pil.care.n':'العناية',
+    'pil.care.t':'نقاء من الداخل والخارج.',
+    'pil.protect.n':'الحماية',
+    'pil.protect.t':'درع لا تراه العين.',
+    'pil.refine.n':'التصحيح',
+    'pil.refine.t':'الطلاء كما خرج من المصنع.',
+    'pkg.care.i1':'تنظيف خارجي بلا ماء',
+    'pkg.care.i2':'تنظيف عميق للمقصورة',
+    'pkg.care.i3':'تغذية الجلد وتظليل الزجاج',
+    'pkg.care.p':'120<i>د.أ</i>',
     'pkg.from':'تبدأ من',
-    'pkg.protect.p':'٣٢٠<i>د.أ</i>',
-    'pkg.refine.p':'١٨٠<i>د.أ</i>',
-    'pkg.care.p':'١٢٠<i>د.أ</i>',
-    'pkg.protect.i1':'طلاء نانو سيراميك',
-    'pkg.protect.i2':'طلاء جرافين',
+    'pkg.popular':'الأكثر طلباً',
+    'pkg.protect.i1':'نانو سيراميك',
+    'pkg.protect.i2':'طلاء الجرافين',
     'pkg.protect.i3':'فيلم حماية الطلاء',
-    'pkg.protect.i4':'طلاء أيرو',
-    'pkg.refine.i1':'تصحيح طلاء متعدد المراحل',
+    'pkg.protect.i4':'طلاء الأيرو',
+    'pkg.protect.p':'320<i>د.أ</i>',
+    'pkg.refine.i1':'تصحيح الطلاء متعدد المراحل',
     'pkg.refine.i2':'تلميع آلي',
     'pkg.refine.i3':'إزالة الخدوش الدائرية والأكسدة',
-    'pkg.care.i1':'تنظيف خارجي بلا ماء',
-    'pkg.care.i2':'استخلاص عميق للمقصورة',
-    'pkg.care.i3':'تغذية الجلد وتظليل الزجاج',
-    'bk.morn':'صباحاً',
-    'bk.aft':'بعد الظهر',
-    'bk.eve':'مساءً',
-    'bk.noSlots':'لا مواعيد متبقية في هذا اليوم — اختر يوماً آخر.',
-    'book.h2':'أحضر الاستوديو إلى بابك',
-    'book.p':'اختر الوقت الذي يناسب يومك. نؤكد حجزك خلال ساعة.',
-    'book.label':'احجز خدمتك',
+    'pkg.refine.p':'180<i>د.أ</i>',
+    'services.foot':'لست متأكداً من الباقة المناسبة لسيارتك؟',
+    'services.h2':'اختر باقتك',
+    'svc.aero.d':'طبقة طاردة للماء بمواصفات الطيران، الماء ينزلق والأوساخ لا تثبت.',
+    'svc.aero.h':'3 – 4 ساعات',
+    'svc.aero.n':'طلاء الأيرو',
+    'svc.assess.d':'يعاين مختصّنا السيارة عند عنوانك ويقترح الباقة المناسبة. بلا رسوم وبلا التزام.',
+    'svc.assess.h':'30 دقيقة',
+    'svc.assess.n':'معاينة مجانية',
+    'svc.ceramic.d':'طبقة سيراميك صلبة تلتحم بالطلاء، وتدوم سنوات لا أشهر.',
+    'svc.ceramic.h':'يوم – يومان',
+    'svc.ceramic.n':'نانو سيراميك',
+    'svc.dryclean.d':'تنظيف خارجي وداخلي بلا ماء، يرفع الغبار دون قطرة واحدة.',
+    'svc.dryclean.h':'ساعة ونصف – ساعتان',
+    'svc.dryclean.n':'تنظيف جاف',
+    'svc.graphene.d':'حمايتنا الأعلى: لمعان أعمق، وتبريد أفضل، وعمر أطول.',
+    'svc.graphene.h':'يوم – يومان',
+    'svc.graphene.n':'طلاء الجرافين',
+    'svc.interior.d':'تنظيف عميق للمقاعد، وتغذية للجلد، وإحياء كامل للمقصورة.',
+    'svc.interior.h':'3 – 4 ساعات',
+    'svc.interior.n':'تجديد المقصورة',
+    'svc.polish.d':'تلميع آلي يعيد العمق واللمعان إلى الطلاء الباهت المخدوش.',
+    'svc.polish.h':'ساعتان – 3 ساعات',
+    'svc.polish.n':'التلميع',
+    'svc.ppf.d':'فيلم ذاتي الترميم يحمي مقدمة السيارة، فتتوقف الحصى قبل أن تصل إلى الطلاء.',
+    'svc.ppf.h':'يومان – 3 أيام',
+    'svc.ppf.n':'فيلم حماية الطلاء',
+    'svc.refine.d':'تصحيح متعدد المراحل يزيل الخدوش الدائرية والتآكل والأكسدة.',
+    'svc.refine.h':'5 – 7 ساعات',
+    'svc.refine.n':'تصحيح الطلاء',
+    'svc.tint.d':'فيلم عازل للحرارة، يُقصّ على مقاس زجاجك ويُركَّب داخل فقاعة محكمة خالية من الغبار.',
+    'svc.tint.h':'ساعتان – 3 ساعات',
+    'svc.tint.n':'تظليل الزجاج',
+    'veh.sedan.n':'سيدان / هاتشباك / رياضية',
+    'veh.suv.n':'دفع رباعي / SUV',
+    'why.h2':'لماذا يختارنا عملاؤنا',
+    'why1.dsc':'إلى المنزل أو المكتب أو موقف المبنى. تسلّمنا المفتاح وتكمل يومك، فلا توصيل ولا استلام.',
+    'why1.ttl':'نأتي إليك',
+    'why2.dsc':'سبعة أمتار من مساحة عمل مغلقة ومفلترة: لا غبار يستقر على الشمع الطازج، ولا رياح تحمل الرمل إلى طلاء مبلل. ظروف المعرض أينما ركنت.',
+    'why2.ttl':'غرفة محكمة',
+    'why3.dsc':'منظفات متعادلة الحموضة، وصلصال ياباني، وطبقات سيراميك تدوم سنوات لا أسابيع، وكلها آمنة على الأغلفة المطفأة والكربون والدهانات الدقيقة.',
+    'why3.ttl':'مواد معتمدة',
+    'why4.dsc':'نصوّر كل سيارة قبل العمل وبعده. وإذا قصّر أي تفصيل عمّا وعدنا به، نعود ونصححه على حسابنا.',
+    'why4.ttl':'عمل مضمون',
+    'ba.cap.front':'الأمام · الطلاء والزجاج',
+    'ba.cap.back':'الخلف · الطلاء والزجاج',
+    'ba.cap.wheel':'العجلة والإطار',
+    'ba.cap.cabin':'المقصورة · المقاعد ولوحة القيادة والمقود',
+    'bk.totalNote':'يُدفع بعد إنجاز العمل',
+    'bk.totalFrom':'سعر مبدئي، يُؤكَّد في الموقع',
   }
 };
 
 function applyLang(lang){
   document.documentElement.lang=lang;
+  const _cn=document.getElementById('ctName'); if(_cn) _cn.placeholder=T[lang]['ph.name'];
   document.getElementById('btnEn').classList.toggle('active',lang==='en');
   document.getElementById('btnAr').classList.toggle('active',lang==='ar');
   document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -2016,10 +2035,11 @@ const ov=document.getElementById('bkOverlay'), bkBody=document.getElementById('b
       bkNextTxt=document.getElementById('bkNextTxt'), bkBack=document.getElementById('bkBack'),
       bkLbl=document.getElementById('bkBarLbl'), bkVal=document.getElementById('bkBarVal');
 const BK={step:1,veh:null,svcs:[],pkgName:null,editing:false,day:0,dayPicked:false,time:null,f:{},done:false};
+const bkProgEl=document.getElementById('bkProg');
 
 const tr=k=>{const l=document.documentElement.lang==='ar'?'ar':'en';return (T[l]&&T[l][k]!==undefined)?T[l][k]:(T.en[k]!==undefined?T.en[k]:k);};
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const loc=()=>document.documentElement.lang==='ar'?'ar-JO':'en-GB';
+const loc=()=>document.documentElement.lang==='ar'?'ar-JO-u-nu-latn':'en-GB';
 const money=n=>n===0?tr('bk.free'):(document.documentElement.lang==='ar'?n+' '+tr('cur'):tr('cur')+' '+n);
 const svcOf=id=>SVC.find(x=>x.id===id), vehOf=id=>VEH.find(x=>x.id===id);
 /* a free visit stays free whatever the vehicle */
@@ -2150,7 +2170,7 @@ function paneReview(){
            v.s?esc('+ '+money(v.s)):esc(tr('bk.nosur')), !v.s);
   return head(tr('bk.h5a'),tr('bk.h5b'),tr('bk.sub5'))+
    '<div class="bk-receipt">'+
-   '<div class="bk-rc-head"><span class="bk-rc-mark">OVERA</span>'+
+   '<div class="bk-rc-head"><span class="bk-rc-mark">'+esc(tr('brand.name'))+'</span>'+
    '<span class="bk-rc-sub">'+esc(tr('bk.items'))+'</span></div>'+
    '<div class="bk-sum">'+
    sumRow('user',tr('bk.sum.who'),'<b>'+esc(BK.f.name||'')+'</b><em>'+esc(BK.f.phone||'')+'</em>',4)+
@@ -2186,7 +2206,7 @@ function paneDone(){
      '<div class="pr-slot" aria-hidden="true"></div>'+
      '<div class="pr-feed">'+
      '<div class="pr-paper">'+
-       '<div class="pr-head"><span class="pr-mark">OVERA</span>'+
+       '<div class="pr-head"><span class="pr-mark">'+esc(tr('brand.name'))+'</span>'+
          '<span class="pr-sub">'+esc(tr('bk.prSub'))+'</span>'+
          '<span class="pr-ref">'+esc(ref)+'</span></div>'+
        '<div class="pr-meta">'+
@@ -2224,6 +2244,9 @@ function valid(){
   return true;
 }
 function bkRender(){
+  /* the progress line counts only the steps the client actually sees */
+  const _pos = BK.lockSvc && BK.step>2 ? BK.step-1 : BK.step;
+  bkProgEl.style.width = (BK.done ? 100 : _pos/(BK.lockSvc?4:5)*100)+'%';
   if(BK.done){ bkBody.innerHTML=paneDone(); bkBar.hidden=true; bkBack.hidden=true; return; }
   bkBar.hidden=false;
   bkBody.innerHTML=PANES[BK.step-1]();
