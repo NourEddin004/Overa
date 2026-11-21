@@ -769,7 +769,11 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
   background:radial-gradient(90% 50% at 100% 0%, rgba(184,149,74,.1), rgba(184,149,74,0) 70%), var(--bg); }
 .bk-mainTop { display:flex; align-items:center; justify-content:space-between; padding:20px 28px 0; }
 .bk-prog { height:3px; margin:16px 28px 0; border-radius:3px; background:rgba(110,20,35,.09); overflow:hidden; }
-.bk-prog i { display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,var(--gold-d),var(--gold) 60%,var(--gold-l)); transition:width .6s var(--ease); }
+/* the fill sits at full width and is revealed with clip-path rather than grown
+   with width: clip-path composites, so stepping through the booking flow costs
+   no layout pass, and the gradient keeps its true geometry instead of being
+   squeezed into whatever the bar's current length happens to be */
+.bk-prog i { display:block; height:100%; width:100%; border-radius:inherit; background:linear-gradient(90deg,var(--gold-d),var(--gold) 60%,var(--gold-l)); clip-path:inset(0 100% 0 0 round 3px); transition:clip-path .6s var(--ease); }
 .bk-icon-btn { width:38px; height:38px; border:1px solid var(--bord); border-radius:50%; background:#fff; color:var(--fg2); font-size:13px; display:flex; align-items:center; justify-content:center; transition:color .2s,border-color .2s,box-shadow .2s; }
 .bk-icon-btn:hover { color:var(--burg); border-color:var(--bordb); box-shadow:var(--lift-1); }
 .bk-icon-btn[hidden] { display:flex; visibility:hidden; }
@@ -2300,7 +2304,8 @@ function valid(){
 function bkRender(){
   /* the progress line counts only the steps the client actually sees */
   const _pos = BK.lockSvc && BK.step>2 ? BK.step-1 : BK.step;
-  bkProgEl.style.width = (BK.done ? 100 : _pos/(BK.lockSvc?4:5)*100)+'%';
+  const _pct = BK.done ? 100 : _pos/(BK.lockSvc?4:5)*100;
+  bkProgEl.style.clipPath = 'inset(0 '+(100-_pct)+'% 0 0 round 3px)';
   if(BK.done){ bkBody.innerHTML=paneDone(); bkBar.hidden=true; bkBack.hidden=true; return; }
   bkBar.hidden=false;
   bkBody.innerHTML=PANES[BK.step-1]();
