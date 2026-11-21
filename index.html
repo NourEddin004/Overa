@@ -2012,6 +2012,30 @@ const T = {
 };
 
 function applyLang(lang){
+  /* Keep the reader exactly where they were. Arabic and English wrap to
+     different heights, so swapping the copy changes the height of everything
+     above the viewport and the page slides under the reader. Pin the section
+     that is currently at the top of the screen, swap the text, then put that
+     same section back at the same offset. html has scroll-behavior: smooth,
+     so the restore has to be an explicit instant scroll or it animates. */
+  const _anchor = (() => {
+    if (scrollY < 4) return null;
+    /* probe below the fixed nav so we pin real content, not the bar */
+    let el = document.elementFromPoint(Math.round(innerWidth / 2), 140)
+          || document.elementFromPoint(24, 140);
+    while (el && el !== document.body) {
+      const pos = getComputedStyle(el).position;
+      if (pos === 'fixed' || pos === 'sticky') { el = el.parentElement; continue; }
+      break;
+    }
+    if (!el || el === document.body || el === document.documentElement) return null;
+    /* the swap below rewrites the innerHTML of every [data-i18n], which throws
+       away their descendants — climb to the nearest node that survives it */
+    const keeper = el.closest('[data-i18n]');
+    if (keeper) el = keeper;
+    return { el, rel: el.getBoundingClientRect().top };
+  })();
+
   document.documentElement.lang=lang;
   const _cn=document.getElementById('ctName'); if(_cn) _cn.placeholder=T[lang]['ph.name'];
   document.getElementById('btnEn').classList.toggle('active',lang==='en');
@@ -2024,6 +2048,14 @@ function applyLang(lang){
   if(_ov&&!_ov.hidden&&typeof bkRender==='function')bkRender();
   if(typeof baRefresh==='function') baRefresh();
   try{localStorage.setItem('overa-lang',lang);}catch(e){}
+
+  if (_anchor) {
+    const target = _anchor.el.getBoundingClientRect().top + scrollY - _anchor.rel;
+    if (Math.abs(target - scrollY) > 0.5) {
+      try { scrollTo({ top: target, behavior: 'instant' }); }
+      catch (e) { scrollTo(0, target); }
+    }
+  }
 }
 document.getElementById('btnEn').addEventListener('click',()=>applyLang('en'));
 document.getElementById('btnAr').addEventListener('click',()=>applyLang('ar'));
