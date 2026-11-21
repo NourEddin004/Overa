@@ -848,7 +848,25 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
 .bk-fld input::placeholder { color:var(--fg3); }
 .bk-fld.err { border-color:rgba(170,30,45,.55); background:rgba(170,30,45,.04); }
 .bk-fld.err label { color:var(--burg); }
-.bk-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+/* a <select> dressed as one of the text fields. appearance:none strips the
+   native arrow, so the wrapper draws its own caret — without it the control
+   reads as a dead text box and nobody taps it. */
+.bk-pick { position:relative; display:block; }
+.bk-pick::after { content:""; position:absolute; inset-inline-end:3px; top:50%; width:6px; height:6px;
+  margin-top:-5px; border-right:1.4px solid var(--fg3); border-bottom:1.4px solid var(--fg3);
+  transform:rotate(45deg); pointer-events:none; }
+.bk-pick select { width:100%; border:none; background:transparent; font-family:var(--sans);
+  font-size:15px; color:var(--fg); outline:none; padding:0 20px 0 0; appearance:none;
+  -webkit-appearance:none; cursor:pointer; }
+/* the empty first option is the placeholder, so grey it the way one looks */
+.bk-pick select:invalid { color:var(--fg3); }
+/* phone: dial code and number live in one field, parted by a hairline */
+.bk-tel { display:flex; align-items:center; }
+.bk-tel .bk-pick { flex:none; }
+.bk-tel .bk-pick select { width:auto; font-variant-numeric:tabular-nums; }
+.bk-tel-rule { flex:none; width:1px; align-self:stretch; min-height:19px; background:var(--bord); margin:0 12px 0 4px; }
+.bk-tel input { flex:1; min-width:0; }
+.ct-card .bk-tel select { font-size:15px; }
 
 /* step 5 — review: an itemised receipt, with the total set apart */
 .bk-receipt { position:relative; background:#fff; border:1px solid var(--bord); border-radius:20px; overflow:hidden; box-shadow:var(--lift-2); }
@@ -1442,14 +1460,14 @@ h2 { font-family:var(--serif); font-weight:500; text-wrap:balance; }
           <input id="ctName" type="text" autocomplete="name" placeholder="e.g. NourEddin" required></div></div>
         <div class="bk-fld"><div class="bk-fld-in">
           <label for="ctVeh" data-i18n="ct.veh">Car category</label>
-          <select id="ctVeh" required>
+          <span class="bk-pick"><select id="ctVeh" required>
             <option value="" data-i18n="ct.choose">Choose…</option>
             <option value="sedan" data-i18n="veh.sedan.n">Sedan / Hatchback</option>
             <option value="suv" data-i18n="veh.suv.n">SUV / 4×4</option>
-          </select></div></div>
+          </select></span></div></div>
         <div class="bk-fld"><div class="bk-fld-in">
           <label for="ctPhone" data-i18n="ct.phone">Phone</label>
-          <input id="ctPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07 9XXX XXXX" required></div></div>
+          <div class="bk-tel"><span class="bk-pick"><select id="ctDial" aria-label="Country code"><option>+962</option><option>+966</option><option>+971</option><option>+965</option><option>+974</option><option>+973</option><option>+968</option><option>+961</option><option>+964</option><option>+970</option><option>+20</option><option>+963</option><option>+44</option><option>+1</option></select></span><span class="bk-tel-rule"></span><input id="ctPhone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="79 XXX XXXX" required></div></div></div>
       </div>
       <p class="ct-err" id="ctErr" hidden data-i18n="ct.err">Please fill in all three.</p>
       <button class="btn-primary ct-send" id="ctSend" type="button"><span data-i18n="ct.send">Send</span></button>
@@ -1621,22 +1639,32 @@ const T = {
     'bk.tz':'Amman time',
     'bk.today':'Today',
     'bk.window':'Our team arrives within the selected hour and sets up in about 20 minutes.',
-    'bk.addr':'Service address',
+    'bk.addr':'Where in Amman',
     'bk.contact':'Contact',
-    'fld.street':'Street',
-    'fld.area':'Area / district',
-    'fld.city':'City',
-    'fld.bldg':'Building / apt',
+    'fld.area':'Area',
+    'fld.addr':'Street and building',
     'fld.name':'Full name',
     'fld.phone':'Phone',
-    'fld.email':'Email (optional)',
-    'ph.street':'Street name',
-    'ph.area':'Abdoun, Deir Ghbar…',
-    'ph.city':'Amman',
-    'ph.bldg':'Building 12, Apt 4',
+    'fld.dial':'Country code',
+    'ph.area':'Choose your area',
+    'ph.addr':'Street name, building or villa no.',
     'ph.name':'Your name',
-    'ph.phone':'07 9XXX XXXX',
-    'ph.email':'you@example.com',
+    'ph.phone':'79 XXX XXXX',
+    'area.abdoun':'Abdoun',
+    'area.deirghbar':'Deir Ghbar',
+    'area.dabouq':'Dabouq',
+    'area.umuthaina':'Um Uthaina',
+    'area.rabieh':'Al Rabieh',
+    'area.sweifieh':'Sweifieh',
+    'area.khalda':'Khalda',
+    'area.jabalamman':'Jabal Amman',
+    'area.shmeisani':'Shmeisani',
+    'area.abdali':'Abdali',
+    'area.tlaalali':'Tla\' Al Ali',
+    'area.marjhamam':'Marj Al Hamam',
+    'area.airport':'Airport Road',
+    'area.other':'Somewhere else in Amman',
+
     'bk.sum.veh':'Vehicle',
     'bk.sum.svc':'Service',
     'bk.sum.when':'Date and time',
@@ -1890,13 +1918,27 @@ const T = {
     'ct.send':'إرسال',
     'ct.veh':'فئة السيارة',
     'cur':'د.أ',
+    'bk.addr':'أين في عمّان',
     'fld.area':'المنطقة',
-    'fld.bldg':'المبنى / الشقة',
-    'fld.city':'المدينة',
-    'fld.email':'البريد الإلكتروني (اختياري)',
+    'fld.addr':'الشارع والمبنى',
     'fld.name':'الاسم الكامل',
     'fld.phone':'رقم الهاتف',
-    'fld.street':'الشارع',
+    'fld.dial':'رمز الدولة',
+    'area.abdoun':'عبدون',
+    'area.deirghbar':'دير غبار',
+    'area.dabouq':'دابوق',
+    'area.umuthaina':'أم أذينة',
+    'area.rabieh':'الرابية',
+    'area.sweifieh':'الصويفية',
+    'area.khalda':'خلدا',
+    'area.jabalamman':'جبل عمّان',
+    'area.shmeisani':'الشميساني',
+    'area.abdali':'العبدلي',
+    'area.tlaalali':'تلاع العلي',
+    'area.marjhamam':'مرج الحمام',
+    'area.airport':'طريق المطار',
+    'area.other':'منطقة أخرى في عمّان',
+
     'footer.about':'خدمة عناية متنقلة وفاخرة بالسيارات، تُقدَّم عند بابك.',
     'footer.city':'عمّان، الأردن',
     'footer.contact':'تواصل معنا',
@@ -1935,13 +1977,10 @@ const T = {
     'svc.assess.h':'٣٠ دقيقة',
     'bk.from':'تبدأ من',
     'bk.totalFrom':'سعر مبدئي — يُؤكَّد عند المعاينة',
-    'ph.area':'عبدون، دير غبار…',
-    'ph.bldg':'مبنى 12، شقة 4',
-    'ph.city':'عمّان',
-    'ph.email':'you@example.com',
+    'ph.area':'اختر منطقتك',
+    'ph.addr':'اسم الشارع ورقم المبنى أو الفيلا',
     'ph.name':'اسمك الكامل',
-    'ph.phone':'07 9XXX XXXX',
-    'ph.street':'اسم الشارع',
+    'ph.phone':'79 XXX XXXX',
     'pil.care.n':'العناية',
     'pil.care.t':'نقاء من الداخل والخارج.',
     'pil.protect.n':'الحماية',
@@ -2092,7 +2131,7 @@ const ov=document.getElementById('bkOverlay'), bkBody=document.getElementById('b
       bkBar=document.getElementById('bkBar'), bkNext=document.getElementById('bkNext'),
       bkNextTxt=document.getElementById('bkNextTxt'), bkBack=document.getElementById('bkBack'),
       bkLbl=document.getElementById('bkBarLbl'), bkVal=document.getElementById('bkBarVal');
-const BK={step:1,veh:null,svcs:[],pkgName:null,editing:false,day:0,dayPicked:false,time:null,f:{},done:false};
+const BK={step:1,veh:null,svcs:[],pkgName:null,editing:false,day:0,dayPicked:false,time:null,f:{dial:'+962'},done:false};
 const bkProgEl=document.getElementById('bkProg');
 
 const tr=k=>{const l=document.documentElement.lang==='ar'?'ar':'en';return (T[l]&&T[l][k]!==undefined)?T[l][k]:(T.en[k]!==undefined?T.en[k]:k);};
@@ -2183,27 +2222,51 @@ function paneSchedule(){
     groups+
     '<div class="bk-note">'+esc(tr('bk.window'))+'</div>';
 }
+/* The studio drives to the client and the client is in Amman, so the city is a
+   given and the district is a short known list — picking from it is one tap and
+   it spares us parsing seven spellings of "Sweifieh" later. */
+const AREAS=['abdoun','deirghbar','dabouq','umuthaina','rabieh','sweifieh','khalda',
+             'jabalamman','shmeisani','abdali','tlaalali','marjhamam','airport','other'];
+/* Jordan first, then the Gulf and the few others this clientele actually carries */
+const DIALS=['+962','+966','+971','+965','+974','+973','+968','+961','+964','+970','+20','+963','+44','+1'];
+
 const FIELDS=[
- {k:'street',ic:'pin',req:1},{k:'area',ic:'pin'},
- {k:'city',ic:'pin',req:1,half:1},{k:'bldg',ic:'pin',half:1},
- {k:'name',ic:'user',req:1,g:2},{k:'phone',ic:'phone',req:1,g:2},{k:'email',ic:'mail',g:2}
+ {k:'area',req:1,sel:1},{k:'addr',req:1},
+ {k:'name',req:1,g:2},{k:'phone',req:1,g:2,tel:1}
 ];
+const areaLabel=()=>BK.f.area?tr('area.'+BK.f.area):'';
+const addrLine=()=>[BK.f.addr,areaLabel()].filter(a=>a&&String(a).trim()).join(', ');
+const telFull=()=>((BK.f.dial||DIALS[0])+' '+(BK.f.phone||'')).trim();
+
 function fld(f){
+  let body;
+  if(f.sel){
+    body='<span class="bk-pick"><select id="bf-'+f.k+'" data-f="'+f.k+'" required>'+
+      '<option value="">'+esc(tr('ph.area'))+'</option>'+
+      AREAS.map(a=>'<option value="'+a+'"'+(BK.f.area===a?' selected':'')+'>'+esc(tr('area.'+a))+'</option>').join('')+
+      '</select></span>';
+  } else if(f.tel){
+    body='<div class="bk-tel">'+
+      '<span class="bk-pick"><select data-f="dial" aria-label="'+esc(tr('fld.dial'))+'">'+
+      DIALS.map(d=>'<option value="'+d+'"'+((BK.f.dial||DIALS[0])===d?' selected':'')+'>'+d+'</option>').join('')+
+      '</select></span><span class="bk-tel-rule"></span>'+
+      '<input id="bf-phone" data-f="phone" type="tel" inputmode="tel" autocomplete="tel-national"'+
+      ' placeholder="'+esc(tr('ph.phone'))+'" value="'+esc(BK.f.phone||'')+'"></div>';
+  } else {
+    body='<input id="bf-'+f.k+'" data-f="'+f.k+'" type="text" placeholder="'+esc(tr('ph.'+f.k))+
+      '" value="'+esc(BK.f[f.k]||'')+'">';
+  }
   return '<div class="bk-fld'+(f.err?' err':'')+'">'+
    '<label for="bf-'+f.k+'">'+esc(tr('fld.'+f.k))+(f.req?'':' <i>'+esc(tr('bk.optional'))+'</i>')+'</label>'+
-   '<input id="bf-'+f.k+'" data-f="'+f.k+'" type="'+(f.k==='phone'?'tel':f.k==='email'?'email':'text')+
-   '" placeholder="'+esc(tr('ph.'+f.k))+'" value="'+esc(BK.f[f.k]||'')+'">'+
-   '</div>';
+   body+'</div>';
 }
 function paneLocation(){
-  const g1=FIELDS.filter(f=>f.g!==2), g2=FIELDS.filter(f=>f.g===2);
   const mark=f=>Object.assign({},f,{err:BK.showErr&&f.req&&!(BK.f[f.k]||'').trim()});
-  const half=g1.filter(f=>f.half).map(f=>fld(mark(f))).join('');
+  const grp=(lbl,set)=>'<div class="bk-grp">'+esc(lbl)+'</div><div class="bk-card">'+
+    set.map(f=>fld(mark(f))).join('')+'</div>';
   return head(tr('bk.h4a'),tr('bk.h4b'),tr('bk.sub4'))+
-   '<div class="bk-grp">'+esc(tr('bk.addr'))+'</div><div class="bk-card">'+
-   g1.filter(f=>!f.half).map(f=>fld(mark(f))).join('')+'<div class="bk-row2">'+half+'</div></div>'+
-   '<div class="bk-grp">'+esc(tr('bk.contact'))+'</div><div class="bk-card">'+
-   g2.map(f=>fld(mark(f))).join('')+'</div>';
+   grp(tr('bk.addr'),FIELDS.filter(f=>f.g!==2))+
+   grp(tr('bk.contact'),FIELDS.filter(f=>f.g===2));
 }
 function sumRow(icon,label,value,step){
   const edit = (BK.lockSvc && step===2) ? '' :
@@ -2214,7 +2277,7 @@ function sumRow(icon,label,value,step){
 }
 function paneReview(){
   const v=vehOf(BK.veh), c=chosen(), d=dayList()[BK.day];
-  const addr=[BK.f.street,BK.f.area,BK.f.city].filter(a=>a&&a.trim()).map(esc).join(', ');
+  const addr=esc(addrLine());
   /* details first, then the money in one itemised column — the order a real
      receipt reads in, so nothing about the price is stated twice */
   const svcNames = BK.lockSvc ? esc(pkgLabel())
@@ -2231,7 +2294,7 @@ function paneReview(){
    '<div class="bk-rc-head"><span class="bk-rc-mark">'+esc(tr('brand.name'))+'</span>'+
    '<span class="bk-rc-sub">'+esc(tr('bk.items'))+'</span></div>'+
    '<div class="bk-sum">'+
-   sumRow('user',tr('bk.sum.who'),'<b>'+esc(BK.f.name||'')+'</b><em>'+esc(BK.f.phone||'')+'</em>',4)+
+   sumRow('user',tr('bk.sum.who'),'<b>'+esc(BK.f.name||'')+'</b><em>'+esc(telFull())+'</em>',4)+
    sumRow('cal',tr('bk.sum.when'),'<b>'+esc(fmtDay(d))+'</b> <i>'+esc(fmtTime(BK.time))+'</i>',3)+
    sumRow('pin',tr('bk.sum.where'),'<b>'+addr+'</b>',4)+
    '</div>'+
@@ -2245,7 +2308,7 @@ function paneReview(){
 }
 function paneDone(){
   const d=dayList()[BK.day], v=vehOf(BK.veh), c=chosen();
-  const addr=[BK.f.street,BK.f.area,BK.f.city].filter(a=>a&&a.trim()).map(esc).join(', ');
+  const addr=esc(addrLine());
   const p2=n=>String(n).padStart(2,'0');
   /* a reference the client can quote on the phone, derived from the slot itself */
   const ref='OV-'+p2(d.getMonth()+1)+p2(d.getDate())+'-'+BK.time.replace(':','');
@@ -2272,7 +2335,7 @@ function paneDone(){
          fld(tr('bk.sum.when'), esc(fmtDay(d))+' · '+esc(fmtTime(BK.time)))+
          fld(tr('bk.sum.where'), addr)+
          '<div><span>'+esc(tr('bk.sum.who'))+'</span><b>'+esc(BK.f.name||'')+'</b>'+
-           '<b class="pr-tel">'+esc(BK.f.phone||'')+'</b></div>'+
+           '<b class="pr-tel">'+esc(telFull())+'</b></div>'+
        '</div>'+
        '<div class="pr-colhead"><span>'+esc(tr('bk.prItems'))+'</span><b>'+esc(tr('cur'))+'</b></div>'+
        '<div class="pr-items">'+items+'</div>'+
@@ -2291,7 +2354,7 @@ function barFor(){
       ? (BK.svcs.length===1 ? tr('svc.'+BK.svcs[0]+'.n') : tr('bk.nSel').replace('{n}',BK.svcs.length))
         +' · '+money(svcTotal()) : '—'];
   if(BK.step===3) return [tr('bar.when'), (BK.dayPicked?fmtDay(dayList()[BK.day]):tr('bk.pickDate'))+(BK.time?' · '+fmtTime(BK.time):'')];
-  if(BK.step===4) return [tr('bar.where'), (BK.f.street||'').trim()?[BK.f.street,BK.f.city].filter(a=>a&&a.trim()).join(', '):tr('bk.addAddr')];
+  if(BK.step===4) return [tr('bar.where'), (BK.f.addr||'').trim()?addrLine():tr('bk.addAddr')];
   return [tr('bk.total'), money(total())];
 }
 function valid(){
